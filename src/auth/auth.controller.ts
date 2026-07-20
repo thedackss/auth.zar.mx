@@ -21,6 +21,7 @@ import { SessionsService } from "@/sessions/sessions.service";
 import { AuthService } from "./auth.service";
 import { Authenticated } from "./decorators/authenticated.decorator";
 import { ChangePasswordDto } from "./dto/change-password.dto";
+import { RecoverPasswordDto } from "./dto/recover-password.dto";
 import { SetPasswordDto } from "./dto/set-password.dto";
 import { SignInDto } from "./dto/sign-in.dto";
 import { SignUpDto } from "./dto/sign-up.dto";
@@ -170,6 +171,41 @@ export class AuthController {
         return {
             data: null,
             message: "Signed out from all devices successfully",
+        };
+    }
+
+    @Post("recover-password")
+    @Throttle({ default: { limit: 3, ttl: 60_000 } })
+    @HttpCode(HttpStatus.OK)
+    public async recoverPassword(
+        @Body() body: RecoverPasswordDto,
+        @Req() req: Request,
+    ) {
+        // Always the same response, whether the account exists or not, so
+        // this endpoint cannot be used to probe which emails are registered.
+        const user = await this.auth.findAccountForRecovery(body.email);
+
+        if (user) {
+            // Per-user cooldown: repeated requests within 5 minutes send
+            // nothing, protecting the inbox and our sender reputation.
+            await this.setPasswordService.issueOncePer(
+                { userId: user.id, email: user.email },
+                "reset",
+                60 * 5,
+            );
+        }
+
+        await this.audit.record({
+            type: "PASSWORD_RECOVER_REQUESTED",
+            userId: user?.id,
+            email: body.email,
+            ...requestMeta(req),
+        });
+
+        return {
+            data: null,
+            message:
+                "If an account exists for that email, a password reset link has been sent.",
         };
     }
 

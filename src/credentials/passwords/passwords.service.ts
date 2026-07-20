@@ -74,6 +74,38 @@ export class PasswordsService {
         return credential;
     }
 
+    /**
+     * Creates or replaces the password without requiring the current one.
+     * Only for token-verified flows (set-password invites, password resets).
+     */
+    public async set(props: CreatePasswordProps) {
+        const passHash = await this.hash(props.password);
+
+        return await this.prisma.client.authCredential
+            .upsert({
+                where: {
+                    userId_provider: {
+                        userId: props.userId,
+                        provider: PROVIDER,
+                    },
+                },
+                create: {
+                    userId: props.userId,
+                    provider: PROVIDER,
+                    providerAccountId: props.userId,
+                    passHash,
+                    passAlgorithm: this.algorithm,
+                },
+                update: { passHash, passAlgorithm: this.algorithm },
+            })
+            .catch(
+                this.prisma.catchKnownErrors({
+                    P2003: `User with id ${props.userId} does not exist`,
+                    P2025: `User with id ${props.userId} does not exist`,
+                }),
+            );
+    }
+
     public async update(props: UpdatePasswordProps) {
         const { userId, password, newPassword } = props;
         const isValid = await this.verify({ userId, password });

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "auth_event_type" ADD VALUE 'PASSWORD_RECOVER_REQUESTED';

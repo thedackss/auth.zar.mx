@@ -54,6 +54,13 @@ export class AuthService {
         return user;
     }
 
+    /** Returns the account a recovery email may be sent to, or null. */
+    public async findAccountForRecovery(email: string) {
+        const user = await this.users.find({ email });
+        if (!user || user.disabledAt) return null;
+        return user;
+    }
+
     public async changePassword(props: ChangePasswordInput) {
         await this.credentials.passwords.update({
             userId: props.userId,

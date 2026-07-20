@@ -67,6 +67,7 @@
                 "EMAIL_VERIFIED",
                 "PASSWORD_SET",
                 "PASSWORD_CHANGED",
+                "PASSWORD_RECOVER_REQUESTED",
                 "ROLE_CHANGED",
                 "ACCOUNT_DISABLED",
                 "ACCOUNT_ENABLED"
@@ -373,6 +374,30 @@
         ]
       }
     },
+    "/auth/recover-password": {
+      "post": {
+        "operationId": "AuthController_recoverPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoverPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/auth/set-password": {
       "post": {
         "operationId": "AuthController_setPassword",
@@ -586,6 +611,21 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "RecoverPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address of the account to recover.",
+            "example": "user@example.com",
+            "maxLength": 254,
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "SetPasswordDto": {
