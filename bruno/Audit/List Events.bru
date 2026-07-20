@@ -1,0 +1,19 @@
+meta {
+  name: List Events
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/audit/events?page=1&limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  limit: 20
+  ~userId: {{userId}}
+  ~type: SIGN_IN_FAILURE
+  ~email: user@example.com
+}

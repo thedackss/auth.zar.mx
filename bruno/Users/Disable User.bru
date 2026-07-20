@@ -1,0 +1,11 @@
+meta {
+  name: Disable User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/users/{{userId}}/disable
+  body: none
+  auth: none
+}

@@ -1,0 +1,113 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "./generated"
+  moduleFormat    = "cjs"
+  runtime         = "nodejs"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [citext]
+}
+
+enum Role {
+  USER
+  ADMIN
+
+  @@map("role")
+}
+
+model User {
+  id    String @id @default(uuid(7))
+  email String @unique @db.Citext
+
+  role Role @default(USER)
+
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  disabledAt      DateTime? @map("disabled_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  authCredentials AuthCredential[]
+
+  @@map("users")
+}
+
+// Single-row table (id is always "default") holding runtime app configuration.
+model AppSettings {
+  id String @id @default("default")
+
+  signupEnabled Boolean @default(true) @map("signup_enabled")
+  // Emails allowed to sign up while signupEnabled is false.
+  // Entries are exact emails or domain wildcards ("*@example.com").
+  signupWhitelist String[] @default([]) @map("signup_whitelist")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+
+model AuthCredential {
+  id     String @id @default(uuid(7))
+  userId String @map("user_id")
+
+  provider          String
+  providerAccountId String @map("provider_account_id")
+
+  passHash      String? @map("pass_hash")
+  passAlgorithm String? @map("pass_algorithm")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("auth_credentials")
+}
+
+enum AuthEventType {
+  SIGN_UP
+  SIGN_IN_SUCCESS
+  SIGN_IN_FAILURE
+  SIGN_OUT
+  SIGN_OUT_ALL
+  EMAIL_VERIFIED
+  PASSWORD_SET
+  PASSWORD_CHANGED
+  ROLE_CHANGED
+  ACCOUNT_DISABLED
+  ACCOUNT_ENABLED
+
+  @@map("auth_event_type")
+}
+
+// Audit trail. Intentionally no FK to users: audit rows must survive any
+// user row change, and failed sign-ins may not resolve to a user at all.
+model AuthEvent {
+  id   String        @id @default(uuid(7))
+  type AuthEventType
+
+  // Subject of the event; null when unresolvable (e.g. failed sign-in).
+  userId String? @map("user_id")
+  // Who performed it when acting on another user (admin actions).
+  actorId String? @map("actor_id")
+
+  // Email as submitted; kept for failed sign-ins against unknown accounts.
+  email     String? @db.Citext
+  ip        String?
+  userAgent String? @map("user_agent")
+  metadata  Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([createdAt])
+  @@map("auth_events")
+}

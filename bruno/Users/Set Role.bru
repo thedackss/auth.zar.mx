@@ -1,0 +1,21 @@
+meta {
+  name: Set Role
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/users/{{userId}}/role
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "role": "ADMIN"
+  }
+}
