@@ -38,17 +38,16 @@ pnpm start:dev
 ## Admin panel
 
 A React (Vite) admin panel lives in `panel/` — a plain standalone project, not
-a workspace. It is served by this API at `/panel` whenever `panel/dist` exists.
+a workspace. The panel is served at the root and the API under `/api`:
+
+- `auth.zar.mx/` → panel (whenever `panel/dist` exists)
+- `auth.zar.mx/api/...` → this API (`/docs` and `/admin/queues` stay backend)
 
 ```bash
-pnpm panel:build   # build panel/dist -> served at http://localhost:3000/panel
-pnpm panel:dev     # vite dev server at http://localhost:5173/panel/
-                   # (proxies API calls to :3000, so run the API too)
+pnpm panel:build   # build panel/dist -> served at http://localhost:3000/
+pnpm panel:dev     # vite dev server at http://localhost:5173/
+                   # (proxies /api to :3000, so run the API too)
 ```
-
-In production `auth.zar.mx` points at this service, so the panel is at
-`auth.zar.mx/panel`. If a reverse proxy fronts it, no extra config is needed —
-the API serves the panel itself.
 
 ## API docs
 

@@ -24,14 +24,15 @@ import { UsersModule } from "@/users/users.module";
 
 const redisUrl = new URL(env.REDIS_URL);
 
-// Admin panel SPA (panel/dist) served at /panel. Skipped when the panel has
-// not been built (e.g. backend-only dev, where vite serves it instead).
+// Admin panel SPA (panel/dist) served at the root; the API lives under
+// /api (global prefix, see main.ts). Skipped when the panel has not been
+// built (e.g. backend-only dev, where vite serves it instead).
 const panelDist = join(process.cwd(), "panel", "dist");
 const panelModule = existsSync(panelDist)
     ? [
           ServeStaticModule.forRoot({
               rootPath: panelDist,
-              serveRoot: "/panel",
+              exclude: ["/api{/*path}", "/docs{/*path}", "/admin{/*path}"],
           }),
       ]
     : [];

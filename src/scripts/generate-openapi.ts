@@ -16,6 +16,9 @@ async function generateOpenApi(): Promise<void> {
         logger: false,
     });
 
+    // Mirror main.ts so the exported spec carries the same /api prefix.
+    app.setGlobalPrefix("api");
+
     const document = createSwaggerDocument(app);
     writeFileSync(OUTPUT_PATH, `${JSON.stringify(document, null, 2)}\n`);
     await app.close();

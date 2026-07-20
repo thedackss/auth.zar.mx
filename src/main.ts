@@ -17,6 +17,7 @@ async function bootstrap() {
 
     app.useLogger(app.get(Logger));
     app.enableShutdownHooks();
+    app.setGlobalPrefix("api");
     app.set("trust proxy", 1);
     app.enableCors({ origin: env.CORS_ORIGINS, credentials: true });
     app.use(cookieParser());
