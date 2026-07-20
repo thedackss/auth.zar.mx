@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
@@ -7,6 +8,11 @@ import { defineConfig } from "vite";
 export default defineConfig({
     base: "/panel/",
     plugins: [react()],
+    resolve: {
+        alias: {
+            "@": fileURLToPath(new URL("./src", import.meta.url)),
+        },
+    },
     server: {
         proxy: {
             "/auth": "http://localhost:3000",

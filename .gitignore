@@ -68,3 +68,6 @@ backup-*.sql
 .tmp
 # Panel build output
 panel/dist
+
+# TS build cache
+*.tsbuildinfo
