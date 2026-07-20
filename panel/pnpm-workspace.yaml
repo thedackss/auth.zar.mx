@@ -1,0 +1,3 @@
+# Marks panel/ as standalone so pnpm does not climb to the backend root.
+allowBuilds:
+  esbuild: true

@@ -1,6 +1,9 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
+import { ServeStaticModule } from "@nestjs/serve-static";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { LoggerModule } from "nestjs-pino";
 import { AppController } from "@/app.controller";
@@ -21,8 +24,21 @@ import { UsersModule } from "@/users/users.module";
 
 const redisUrl = new URL(env.REDIS_URL);
 
+// Admin panel SPA (panel/dist) served at /panel. Skipped when the panel has
+// not been built (e.g. backend-only dev, where vite serves it instead).
+const panelDist = join(process.cwd(), "panel", "dist");
+const panelModule = existsSync(panelDist)
+    ? [
+          ServeStaticModule.forRoot({
+              rootPath: panelDist,
+              serveRoot: "/panel",
+          }),
+      ]
+    : [];
+
 @Module({
     imports: [
+        ...panelModule,
         LoggerModule.forRoot(loggerConfig),
         ThrottlerModule.forRoot({
             throttlers: [{ ttl: 60_000, limit: 60 }],

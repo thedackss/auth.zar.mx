@@ -66,3 +66,5 @@ backup-*.sql
 .claude
 .temp
 .tmp
+# Panel build output
+panel/dist
