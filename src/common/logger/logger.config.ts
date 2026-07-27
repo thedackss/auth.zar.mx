@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { RequestMethod } from "@nestjs/common";
 import type { Params } from "nestjs-pino";
 import { env } from "@/env";
 
@@ -13,6 +14,10 @@ const Transport = {
 } as const;
 
 export const loggerConfig: Params = {
+    // nestjs-pino's default is the legacy "*" path, which Nest 11 warns
+    // about (LegacyRouteConverter) once the /api global prefix is applied.
+    // Same coverage, current Express 5 route syntax.
+    forRoutes: [{ path: "{*splat}", method: RequestMethod.ALL }],
     pinoHttp: {
         level: env.NODE_ENV === "production" ? "info" : "debug",
         transport: env.NODE_ENV !== "production" ? Transport : undefined,
