@@ -2,6 +2,7 @@ import "./main.scss";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { AuthProvider } from "@/context/auth";
 import { routeTree } from "./routeTree.gen";
 
 const router = createRouter({
@@ -21,6 +22,8 @@ if (!root) throw new Error("Missing #root element");
 
 createRoot(root).render(
     <StrictMode>
-        <RouterProvider router={router} />
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
     </StrictMode>,
 );

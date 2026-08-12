@@ -3,6 +3,7 @@ import { type FormEvent, useState } from "react";
 import { api, ApiError } from "@/api";
 import AuthView from "@/components/auth-view";
 import form from "@/components/auth-view/form.module.scss";
+import { useAuth } from "@/context/auth";
 
 export const Route = createFileRoute("/sign-in")({
     component: SignIn,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/sign-in")({
 
 function SignIn() {
     const navigate = useNavigate();
+    const { refresh } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,8 @@ function SignIn() {
                 method: "POST",
                 body: JSON.stringify({ email, password }),
             });
-            navigate({ to: "/", replace: true });
+            await refresh();
+            navigate({ to: "/dashboard", replace: true });
         } catch (err) {
             setError(
                 err instanceof ApiError ? err.message : "Something went wrong",
