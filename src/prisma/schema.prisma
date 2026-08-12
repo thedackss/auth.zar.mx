@@ -32,6 +32,7 @@ model User {
   deletedAt DateTime? @map("deleted_at")
 
   authCredentials AuthCredential[]
+  appAccesses     AppAccess[]
 
   @@map("users")
 }
@@ -40,14 +41,56 @@ model User {
 model AppSettings {
   id String @id @default("default")
 
-  signupEnabled Boolean @default(true) @map("signup_enabled")
-  // Emails allowed to sign up while signupEnabled is false.
-  // Entries are exact emails or domain wildcards ("*@example.com").
-  signupWhitelist String[] @default([]) @map("signup_whitelist")
+  // Allows direct public sign-up on auth.zar.mx itself. App-mediated
+  // sign-up is governed per-app (App.public / AppAccess), not by this.
+  signupEnabled Boolean @default(false) @map("signup_enabled")
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("app_settings")
+}
+
+// A registered downstream application (a zar app). Apps authenticate
+// server-to-server with an API key (only its sha256 hash is stored).
+// Public apps accept any zar user; private apps require an AppAccess grant.
+model App {
+  id   String  @id @default(uuid(7))
+  name String  @unique @db.Citext
+  url  String?
+
+  public  Boolean @default(false)
+  keyHash String  @unique @map("key_hash")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  accesses AppAccess[]
+
+  @@map("apps")
+}
+
+// Per-user (or pre-authorized email) access to a private app. Exactly one
+// of userId/email is set: email grants let that address sign up through the
+// app and convert to user grants on registration.
+model AppAccess {
+  id    String @id @default(uuid(7))
+  appId String @map("app_id")
+
+  userId String? @map("user_id")
+  email  String? @db.Citext
+
+  // Admin who granted it; null when auto-granted at app sign-up.
+  grantedBy String?  @map("granted_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  app  App   @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, userId])
+  @@unique([appId, email])
+  @@index([userId])
+  @@map("app_accesses")
 }
 
 model AuthCredential {
@@ -84,6 +127,13 @@ enum AuthEventType {
   ROLE_CHANGED
   ACCOUNT_DISABLED
   ACCOUNT_ENABLED
+  APP_CREATED
+  APP_UPDATED
+  APP_KEY_REGENERATED
+  APP_REVOKED
+  APP_ACCESS_GRANTED
+  APP_ACCESS_REVOKED
+  APP_TOKEN_DENIED
 
   @@map("auth_event_type")
 }

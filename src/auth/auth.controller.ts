@@ -28,7 +28,6 @@ import { SignUpDto } from "./dto/sign-up.dto";
 import { VerifyEmailDto } from "./dto/verify-email.dto";
 import { EmailVerificationService } from "./email-verification.service";
 import { SetPasswordService } from "./set-password.service";
-import { TokenService } from "./token.service";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -38,7 +37,6 @@ export class AuthController {
         private readonly sessions: SessionsService,
         private readonly verification: EmailVerificationService,
         private readonly setPasswordService: SetPasswordService,
-        private readonly tokens: TokenService,
         private readonly audit: AuditService,
     ) {}
 
@@ -55,17 +53,6 @@ export class AuthController {
     @Authenticated()
     public async me(@CurrentUser() data: User) {
         return { data, message: "Current user retrieved successfully" };
-    }
-
-    @Post("token")
-    @Authenticated()
-    @HttpCode(HttpStatus.OK)
-    public async token(@CurrentUser() user: User) {
-        const data = this.tokens.sign(user);
-        return {
-            data,
-            message: "Access token issued successfully",
-        };
     }
 
     @Post("sign-up")

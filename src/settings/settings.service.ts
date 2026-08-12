@@ -5,8 +5,7 @@ import { UpdateSettingsProps } from "./interfaces/update.interface";
 const SETTINGS_ID = "default";
 
 const DEFAULTS = {
-    signupEnabled: true,
-    signupWhitelist: [] as string[],
+    signupEnabled: false,
 };
 
 @Injectable()
@@ -30,32 +29,11 @@ export class SettingsService {
     }
 
     /**
-     * Sign-up is open to everyone while signupEnabled is true; otherwise only
-     * whitelisted emails may join. Whitelist entries are exact emails or
-     * domain wildcards ("*@example.com"), matched case-insensitively.
+     * Governs direct public sign-up on auth.zar.mx only. App-mediated
+     * sign-up is decided per app (App.public / AppAccess grants) instead.
      */
-    public async isSignupAllowed(email: string): Promise<boolean> {
+    public async isSignupAllowed(): Promise<boolean> {
         const settings = await this.get();
-        if (settings.signupEnabled) return true;
-
-        return SettingsService.matchesWhitelist(
-            email,
-            settings.signupWhitelist,
-        );
-    }
-
-    public static matchesWhitelist(
-        email: string,
-        whitelist: string[],
-    ): boolean {
-        const normalized = email.trim().toLowerCase();
-        const domain = normalized.split("@")[1];
-
-        return whitelist.some((rawEntry) => {
-            const entry = rawEntry.trim().toLowerCase();
-            if (entry.startsWith("*@"))
-                return domain !== undefined && entry.slice(2) === domain;
-            return entry === normalized;
-        });
+        return settings.signupEnabled;
     }
 }

@@ -22,7 +22,7 @@ export class AuthService {
     ) {}
 
     public async signUp({ email, password }: AuthInput) {
-        if (!(await this.settings.isSignupAllowed(email)))
+        if (!(await this.settings.isSignupAllowed()))
             throw new ForbiddenException("Sign-up is currently restricted");
 
         return await this.prisma.client.$transaction(async (tx) => {

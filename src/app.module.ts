@@ -8,6 +8,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { LoggerModule } from "nestjs-pino";
 import { AppController } from "@/app.controller";
 import { AppService } from "@/app.service";
+import { AppsModule } from "@/apps/apps.module";
 import { AuditModule } from "@/audit/audit.module";
 import { AuthModule } from "@/auth/auth.module";
 import { loggerConfig } from "@/common/logger/logger.config";
@@ -62,6 +63,7 @@ const panelModule = existsSync(panelDist)
         AuditModule,
         UsersModule,
         AuthModule,
+        AppsModule,
         CredentialsModule,
         SessionsModule,
         SettingsModule,

@@ -1,41 +1,33 @@
 import { SettingsService } from "./settings.service";
 
-describe("SettingsService.matchesWhitelist", () => {
-    it("matches exact emails case-insensitively", () => {
-        expect(
-            SettingsService.matchesWhitelist("Boss@Geoil.com", [
-                "boss@geoil.com",
-            ]),
-        ).toBe(true);
+// isSignupAllowed now only reflects the signupEnabled flag; app-mediated
+// sign-up authorization lives in AppsService (per-app public/grants).
+describe("SettingsService.isSignupAllowed", () => {
+    function serviceWithRow(row: { signupEnabled: boolean } | null) {
+        const prisma = {
+            client: {
+                appSettings: {
+                    findUnique: jest.fn().mockResolvedValue(row),
+                },
+            },
+        };
+
+        // biome-ignore lint/suspicious/noExplicitAny: minimal prisma stub
+        return new SettingsService(prisma as any);
+    }
+
+    it("allows sign-up while enabled", async () => {
+        const service = serviceWithRow({ signupEnabled: true });
+        await expect(service.isSignupAllowed()).resolves.toBe(true);
     });
 
-    it("matches domain wildcards", () => {
-        expect(
-            SettingsService.matchesWhitelist("diego@geoil.com", [
-                "*@geoil.com",
-            ]),
-        ).toBe(true);
+    it("denies sign-up while disabled", async () => {
+        const service = serviceWithRow({ signupEnabled: false });
+        await expect(service.isSignupAllowed()).resolves.toBe(false);
     });
 
-    it("does not match other domains against a wildcard", () => {
-        expect(
-            SettingsService.matchesWhitelist("diego@gmail.com", [
-                "*@geoil.com",
-            ]),
-        ).toBe(false);
-    });
-
-    it("does not match when the whitelist is empty", () => {
-        expect(SettingsService.matchesWhitelist("diego@geoil.com", [])).toBe(
-            false,
-        );
-    });
-
-    it("trims whitespace in entries and input", () => {
-        expect(
-            SettingsService.matchesWhitelist(" diego@geoil.com ", [
-                " *@geoil.com ",
-            ]),
-        ).toBe(true);
+    it("denies sign-up when no settings row exists (safe default)", async () => {
+        const service = serviceWithRow(null);
+        await expect(service.isSignupAllowed()).resolves.toBe(false);
     });
 });

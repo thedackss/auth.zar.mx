@@ -20,5 +20,6 @@ import { TokenService } from "./token.service";
         TokenService,
     ],
     imports: [UsersModule, CredentialsModule, SessionsModule, SettingsModule],
+    exports: [TokenService, EmailVerificationService],
 })
 export class AuthModule {}

@@ -10,6 +10,7 @@ export const PERMISSIONS = [
     "users.roles.assign",
     "users.disable",
     "settings.manage",
+    "apps.manage",
     "queues.read",
     "audit.read",
 ] as const;
