@@ -32,17 +32,39 @@ function DashboardLayout() {
                 </Link>
 
                 <nav>
-                    <Link to="/dashboard/users" activeProps={{ "data-active": true }}>
-                        users
-                    </Link>
+                    {user.role === "ADMIN" && (
+                        <>
+                            <Link
+                                to="/dashboard/users"
+                                activeProps={{ "data-active": true }}
+                            >
+                                users
+                            </Link>
+                            <Link
+                                to="/dashboard/apps"
+                                activeProps={{ "data-active": true }}
+                            >
+                                apps
+                            </Link>
+                            <Link
+                                to="/dashboard/settings"
+                                activeProps={{ "data-active": true }}
+                            >
+                                settings
+                            </Link>
+                            <Link
+                                to="/dashboard/audit"
+                                activeProps={{ "data-active": true }}
+                            >
+                                audit
+                            </Link>
+                        </>
+                    )}
                     <Link
-                        to="/dashboard/settings"
+                        to="/dashboard/account"
                         activeProps={{ "data-active": true }}
                     >
-                        settings
-                    </Link>
-                    <Link to="/dashboard/audit" activeProps={{ "data-active": true }}>
-                        audit
+                        account
                     </Link>
                 </nav>
 

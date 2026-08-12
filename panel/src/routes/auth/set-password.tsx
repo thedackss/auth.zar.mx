@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
-import { api, ApiError } from "@/api";
+import { ApiError, api } from "@/api";
 import AuthView from "@/components/auth-view";
 import form from "@/components/auth-view/form.module.scss";
 
@@ -83,7 +83,6 @@ function SetPassword() {
                         id="password"
                         type="password"
                         autoComplete="new-password"
-                        autoFocus
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}

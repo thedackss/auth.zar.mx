@@ -7,15 +7,26 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
 ## Architecture decisions (settled — don't re-litigate)
 
 - **Hybrid auth**: clients authenticate with Redis-backed sessions (httpOnly
-  cookies); `POST /auth/token` exchanges a session for a short-lived HS256 JWT
-  that internal services verify offline with `AUTH_SECRET`.
+  cookies); `POST /app/token` (app-key + session) exchanges a session for a
+  short-lived HS256 JWT that internal services verify offline with
+  `AUTH_SECRET`. Tokens are app-scoped: `aud` is the issuing app's id and
+  each app must reject other audiences.
+- **App registry & per-app access**: downstream apps register in the `apps`
+  table and authenticate server-to-server with an `X-App-Key` (sha256 hash
+  stored). Public apps accept any zar user; private apps require an
+  `AppAccess` grant (existing user, or a pre-authorized email that converts
+  to a user grant when that email signs up through the app —
+  `POST /app/sign-up`). One central account works across all zar apps; each
+  app keeps its own per-user data keyed by the JWT `sub`.
 - **Roles are central, permissions are per-service**: only `USER`/`ADMIN` roles
   live here. Each downstream service maps roles to its own permissions. This
   service's own auth-scoped permissions (e.g. `auth.signin`, `auth.signup`)
   are in `src/auth/permissions.ts`, enforced via `@RequirePermissions()`.
-- **Sign-up gating**: `AppSettings` (single-row table, admin-only `/settings`)
-  toggles open sign-up plus an email whitelist (exact or `*@domain`).
-  Disabling a user blocks sign-in and destroys all their sessions.
+- **Sign-up gating**: `AppSettings.signupEnabled` (default false) governs
+  direct sign-up on auth.zar.mx only; app-mediated sign-up is governed per
+  app (public flag / access grants). The old email whitelist was replaced by
+  per-app grants. Disabling a user blocks sign-in and destroys all their
+  sessions.
 - **Audit trail**: `AuthEvent` records auth events with no FK to users
   (rows must survive user changes; failed sign-ins may not resolve to a user).
 - **Admin bootstrap**: on startup, creates the admin from env and queues a

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
-import { api, ApiError } from "@/api";
+import { ApiError, api } from "@/api";
 import AuthView from "@/components/auth-view";
 import form from "@/components/auth-view/form.module.scss";
 
@@ -48,7 +48,6 @@ function RecoverPassword() {
                             id="email"
                             type="email"
                             autoComplete="email"
-                            autoFocus
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

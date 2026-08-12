@@ -1,0 +1,21 @@
+meta {
+  name: Grant Access
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/apps/{{appId}}/access
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "user@example.com"
+  }
+}

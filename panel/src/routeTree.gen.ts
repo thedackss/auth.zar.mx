@@ -16,6 +16,8 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
+import { Route as DashboardAppsRouteImport } from './routes/dashboard/apps'
 import { Route as DashboardAuditRouteImport } from './routes/dashboard/audit'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
@@ -55,6 +57,16 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardAccountRoute = DashboardAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAppsRoute = DashboardAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardAuditRoute = DashboardAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -78,6 +90,8 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/apps': typeof DashboardAppsRoute
   '/dashboard/audit': typeof DashboardAuditRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -89,6 +103,8 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/apps': typeof DashboardAppsRoute
   '/dashboard/audit': typeof DashboardAuditRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -102,6 +118,8 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/apps': typeof DashboardAppsRoute
   '/dashboard/audit': typeof DashboardAuditRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -116,6 +134,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/auth/set-password'
     | '/auth/verify-email'
+    | '/dashboard/account'
+    | '/dashboard/apps'
     | '/dashboard/audit'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -127,6 +147,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/auth/set-password'
     | '/auth/verify-email'
+    | '/dashboard/account'
+    | '/dashboard/apps'
     | '/dashboard/audit'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -139,6 +161,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/auth/set-password'
     | '/auth/verify-email'
+    | '/dashboard/account'
+    | '/dashboard/apps'
     | '/dashboard/audit'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -205,6 +229,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/account': {
+      id: '/dashboard/account'
+      path: '/account'
+      fullPath: '/dashboard/account'
+      preLoaderRoute: typeof DashboardAccountRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/apps': {
+      id: '/dashboard/apps'
+      path: '/apps'
+      fullPath: '/dashboard/apps'
+      preLoaderRoute: typeof DashboardAppsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/audit': {
       id: '/dashboard/audit'
       path: '/audit'
@@ -230,6 +268,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteRouteChildren {
+  DashboardAccountRoute: typeof DashboardAccountRoute
+  DashboardAppsRoute: typeof DashboardAppsRoute
   DashboardAuditRoute: typeof DashboardAuditRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
@@ -237,6 +277,8 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardAccountRoute: DashboardAccountRoute,
+  DashboardAppsRoute: DashboardAppsRoute,
   DashboardAuditRoute: DashboardAuditRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardUsersRoute: DashboardUsersRoute,

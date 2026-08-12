@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { api, ApiError, type AuthEvent, type Paginated } from "@/api";
+import { ApiError, type AuthEvent, api, type Paginated } from "@/api";
+import { AdminOnly } from "./-admin";
 import shared from "./-shared.module.scss";
 
 export const Route = createFileRoute("/dashboard/audit")({
-    component: Audit,
+    component: () => (
+        <AdminOnly>
+            <Audit />
+        </AdminOnly>
+    ),
 });
 
 function Audit() {
@@ -77,7 +82,8 @@ function Audit() {
                     prev
                 </button>
                 <span>
-                    page {events.meta.page} / {Math.max(events.meta.totalPages, 1)}
+                    page {events.meta.page} /{" "}
+                    {Math.max(events.meta.totalPages, 1)}
                 </span>
                 <button
                     type="button"

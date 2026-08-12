@@ -95,6 +95,61 @@
     color: var(--color-muted);
 }
 
+.inlineForm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(0.25rem * 3);
+
+    font-size: 0.85rem;
+
+    input:not([type="checkbox"]) {
+        padding: calc(0.25rem * 1.5) calc(0.25rem * 3);
+
+        font-size: 0.85rem;
+        font-family: inherit;
+        color: var(--color-text);
+
+        background: transparent;
+        border: 1px solid color-mix(in oklch, var(--color-text) 12%, transparent);
+        border-radius: 2px;
+
+        transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:focus {
+            outline: none;
+            border-color: color-mix(in oklch, var(--color-accent) 50%, transparent);
+        }
+
+        &::placeholder {
+            color: color-mix(in oklch, var(--color-muted) 60%, transparent);
+        }
+    }
+
+    input[type="checkbox"] {
+        accent-color: var(--color-accent);
+    }
+
+    label {
+        color: var(--color-muted);
+        font-size: 0.8rem;
+    }
+}
+
+.subsection {
+    display: flex;
+    flex-direction: column;
+    gap: calc(0.25rem * 4);
+
+    padding-top: calc(0.25rem * 4);
+    border-top: 1px solid color-mix(in oklch, var(--color-text) 6%, transparent);
+
+    h2 {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+}
+
 .pager {
     display: flex;
     align-items: center;

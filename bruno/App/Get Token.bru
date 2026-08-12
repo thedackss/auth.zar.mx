@@ -1,11 +1,15 @@
 meta {
   name: Get Token
   type: http
-  seq: 10
+  seq: 2
 }
 
 post {
-  url: {{baseUrl}}/auth/token
+  url: {{baseUrl}}/app/token
   body: none
   auth: none
+}
+
+headers {
+  X-App-Key: {{appKey}}
 }

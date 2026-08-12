@@ -1,0 +1,21 @@
+meta {
+  name: Update App
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/apps/{{appId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "public": true
+  }
+}

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import styles from "./index.module.scss";
 
 interface AuthViewProps {

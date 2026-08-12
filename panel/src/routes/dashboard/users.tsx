@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { api, ApiError, type User } from "@/api";
+import { ApiError, api, type User } from "@/api";
 import { useAuth } from "@/context/auth";
+import { AdminOnly } from "./-admin";
 import shared from "./-shared.module.scss";
 
 export const Route = createFileRoute("/dashboard/users")({
-    component: Users,
+    component: () => (
+        <AdminOnly>
+            <Users />
+        </AdminOnly>
+    ),
 });
 
 function Users() {
@@ -35,9 +40,7 @@ function Users() {
             await run();
             await load();
         } catch (err) {
-            setError(
-                err instanceof ApiError ? err.message : "Action failed",
-            );
+            setError(err instanceof ApiError ? err.message : "Action failed");
         } finally {
             setBusyId(null);
         }

@@ -9,7 +9,27 @@ export interface User {
 
 export interface AppSettings {
     signupEnabled: boolean;
-    signupWhitelist: string[];
+}
+
+export interface ZarApp {
+    id: string;
+    name: string;
+    url: string | null;
+    public: boolean;
+    createdAt: string;
+    updatedAt: string;
+    revokedAt: string | null;
+    _count?: { accesses: number };
+}
+
+export interface AppAccess {
+    id: string;
+    appId: string;
+    userId: string | null;
+    email: string | null;
+    grantedBy: string | null;
+    createdAt: string;
+    user: { id: string; email: string } | null;
 }
 
 export interface AuthEvent {

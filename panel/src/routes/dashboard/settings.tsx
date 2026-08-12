@@ -1,26 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { type FormEvent, useEffect, useState } from "react";
-import { api, ApiError, type AppSettings } from "@/api";
+import { ApiError, type AppSettings, api } from "@/api";
 import form from "@/components/auth-view/form.module.scss";
+import { AdminOnly } from "./-admin";
 import shared from "./-shared.module.scss";
 
 export const Route = createFileRoute("/dashboard/settings")({
-    component: Settings,
+    component: () => (
+        <AdminOnly>
+            <Settings />
+        </AdminOnly>
+    ),
 });
 
 function Settings() {
     const [settings, setSettings] = useState<AppSettings | null>(null);
-    const [whitelist, setWhitelist] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [saved, setSaved] = useState(false);
     const [busy, setBusy] = useState(false);
 
     useEffect(() => {
         api<AppSettings>("/settings")
-            .then((s) => {
-                setSettings(s);
-                setWhitelist(s.signupWhitelist.join("\n"));
-            })
+            .then(setSettings)
             .catch((err) =>
                 setError(
                     err instanceof ApiError
@@ -37,26 +38,17 @@ function Settings() {
         setError(null);
         setSaved(false);
 
-        const entries = whitelist
-            .split("\n")
-            .map((line) => line.trim())
-            .filter(Boolean);
-
         try {
             const next = await api<AppSettings>("/settings", {
                 method: "PATCH",
                 body: JSON.stringify({
                     signupEnabled: settings.signupEnabled,
-                    signupWhitelist: entries,
                 }),
             });
             setSettings(next);
-            setWhitelist(next.signupWhitelist.join("\n"));
             setSaved(true);
         } catch (err) {
-            setError(
-                err instanceof ApiError ? err.message : "Failed to save",
-            );
+            setError(err instanceof ApiError ? err.message : "Failed to save");
         } finally {
             setBusy(false);
         }
@@ -71,7 +63,11 @@ function Settings() {
     }
 
     return (
-        <form className={form.form} onSubmit={onSubmit} style={{ maxWidth: "28rem" }}>
+        <form
+            className={form.form}
+            onSubmit={onSubmit}
+            style={{ maxWidth: "28rem" }}
+        >
             <div className={form.field}>
                 <label htmlFor="signup">
                     <input
@@ -87,18 +83,10 @@ function Settings() {
                     />{" "}
                     open sign-up enabled
                 </label>
-            </div>
-
-            <div className={form.field}>
-                <label htmlFor="whitelist">
-                    sign-up whitelist (one per line, email or *@domain)
-                </label>
-                <textarea
-                    id="whitelist"
-                    rows={6}
-                    value={whitelist}
-                    onChange={(e) => setWhitelist(e.target.value)}
-                />
+                <p className={form.note}>
+                    Direct sign-up on auth.zar.mx only — app sign-up is governed
+                    per app in the apps tab.
+                </p>
             </div>
 
             {error && <p className={form.error}>{error}</p>}

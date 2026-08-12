@@ -50,7 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         [user, loading, refresh, signOut],
     );
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    );
 }
 
 export function useAuth(): AuthState {

@@ -1,0 +1,11 @@
+meta {
+  name: Revoke Access
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/apps/{{appId}}/access/{{accessId}}
+  body: none
+  auth: none
+}
