@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
@@ -6,7 +7,13 @@ import { defineConfig } from "vite";
 // In dev, /api is proxied to the local zar-auth server so the browser
 // sees a single origin and session cookies work unchanged.
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        tanstackRouter({
+            target: "react",
+            autoCodeSplitting: true,
+        }),
+        react(),
+    ],
     resolve: {
         alias: {
             "@": fileURLToPath(new URL("./src", import.meta.url)),

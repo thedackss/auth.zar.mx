@@ -10,7 +10,8 @@
             "**",
             "!!**/dist",
             "!package-lock.json",
-            "!!**/prisma/generated"
+            "!!**/prisma/generated",
+            "!**/routeTree.gen.ts"
         ]
     },
     "formatter": {

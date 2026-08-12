@@ -71,3 +71,6 @@ panel/dist
 
 # TS build cache
 *.tsbuildinfo
+
+# TanStack Router codegen cache (panel)
+panel/.tanstack/tmp
