@@ -14,7 +14,12 @@
         color: var(--color-muted);
     }
 
-    input {
+    input[type="checkbox"] {
+        accent-color: var(--color-accent);
+    }
+
+    input:not([type="checkbox"]),
+    textarea {
         padding: calc(0.25rem * 2.5) calc(0.25rem * 3);
 
         font-size: 0.9rem;

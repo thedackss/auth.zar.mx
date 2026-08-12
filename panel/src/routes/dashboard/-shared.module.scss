@@ -1,0 +1,105 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+
+    font-size: 0.85rem;
+
+    th,
+    td {
+        padding: calc(0.25rem * 2.5) calc(0.25rem * 3);
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    th {
+        font-weight: inherit;
+        font-size: 0.75rem;
+        color: var(--color-muted);
+
+        border-bottom: 1px solid
+            color-mix(in oklch, var(--color-text) 10%, transparent);
+    }
+
+    td {
+        border-bottom: 1px solid
+            color-mix(in oklch, var(--color-text) 4%, transparent);
+    }
+
+    tr:hover td {
+        background: color-mix(in oklch, var(--color-text) 2%, transparent);
+    }
+}
+
+.wrap {
+    overflow-x: auto;
+}
+
+.tag {
+    padding: calc(0.25rem * 0.5) calc(0.25rem * 2);
+
+    font-size: 0.7rem;
+
+    border: 1px solid color-mix(in oklch, var(--color-text) 15%, transparent);
+    border-radius: 2px;
+    color: var(--color-muted);
+
+    &[data-tone="accent"] {
+        color: var(--color-accent);
+        border-color: color-mix(in oklch, var(--color-accent) 40%, transparent);
+    }
+
+    &[data-tone="danger"] {
+        color: #f87171;
+        border-color: color-mix(in oklch, #f87171 40%, transparent);
+    }
+}
+
+.action {
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+
+    background: none;
+    border: 1px solid color-mix(in oklch, var(--color-text) 12%, transparent);
+    border-radius: 2px;
+    padding: calc(0.25rem * 1) calc(0.25rem * 2);
+    cursor: pointer;
+
+    transition:
+        color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+        color: var(--color-accent);
+        border-color: color-mix(in oklch, var(--color-accent) 40%, transparent);
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+}
+
+.actions {
+    display: flex;
+    gap: calc(0.25rem * 2);
+}
+
+.error {
+    font-size: 0.8rem;
+    color: #f87171;
+}
+
+.muted {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    gap: calc(0.25rem * 4);
+
+    font-size: 0.75rem;
+    color: var(--color-muted);
+}
