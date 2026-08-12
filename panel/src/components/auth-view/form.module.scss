@@ -18,8 +18,15 @@
         accent-color: var(--color-accent);
     }
 
+    textarea {
+        resize: vertical;
+        min-height: calc(0.25rem * 20);
+        max-height: 50dvh;
+    }
+
     input:not([type="checkbox"]),
     textarea {
+        width: 100%;
         padding: calc(0.25rem * 2.5) calc(0.25rem * 3);
 
         font-size: 0.9rem;
