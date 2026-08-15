@@ -36,7 +36,7 @@ function SetPassword() {
         setError(null);
 
         try {
-            await api("/auth/set-password", {
+            await api("/set-password", {
                 method: "POST",
                 body: JSON.stringify({ token, password }),
             });

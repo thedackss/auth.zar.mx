@@ -23,7 +23,7 @@ function SignIn() {
         setError(null);
 
         try {
-            await api("/auth/sign-in", {
+            await api("/sign-in", {
                 method: "POST",
                 body: JSON.stringify({ email, password }),
             });

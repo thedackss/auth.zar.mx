@@ -11,7 +11,7 @@ import { env } from "@/env";
 import { SessionsService } from "@/sessions/sessions.service";
 import { UsersService } from "@/users/users.service";
 
-const ROUTE = "/admin/queues";
+const ROUTE = "/bullmq";
 
 // The dashboard is mounted as plain Express middleware, outside Nest's guard
 // pipeline, so it runs its own session check with the same services.

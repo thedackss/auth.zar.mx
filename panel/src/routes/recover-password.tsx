@@ -20,7 +20,7 @@ function RecoverPassword() {
         setError(null);
 
         try {
-            await api("/auth/recover-password", {
+            await api("/recover-password", {
                 method: "POST",
                 body: JSON.stringify({ email }),
             });

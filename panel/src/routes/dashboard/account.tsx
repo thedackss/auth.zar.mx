@@ -28,7 +28,7 @@ function Account() {
         setDone(false);
 
         try {
-            await api("/auth/change-password", {
+            await api("/change-password", {
                 method: "POST",
                 body: JSON.stringify({
                     currentPassword: current,

@@ -261,7 +261,7 @@
                 "tags": ["users"]
             }
         },
-        "/api/auth/me": {
+        "/api/me": {
             "get": {
                 "operationId": "AuthController_me",
                 "parameters": [],
@@ -273,7 +273,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/sign-up": {
+        "/api/sign-up": {
             "post": {
                 "operationId": "AuthController_signUp",
                 "parameters": [],
@@ -295,7 +295,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/sign-in": {
+        "/api/sign-in": {
             "post": {
                 "operationId": "AuthController_signIn",
                 "parameters": [],
@@ -317,7 +317,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/sign-out": {
+        "/api/sign-out": {
             "post": {
                 "operationId": "AuthController_signOut",
                 "parameters": [],
@@ -329,7 +329,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/sign-out-all": {
+        "/api/sign-out-all": {
             "post": {
                 "operationId": "AuthController_signOutAll",
                 "parameters": [],
@@ -341,7 +341,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/recover-password": {
+        "/api/recover-password": {
             "post": {
                 "operationId": "AuthController_recoverPassword",
                 "parameters": [],
@@ -363,7 +363,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/set-password": {
+        "/api/set-password": {
             "post": {
                 "operationId": "AuthController_setPassword",
                 "parameters": [],
@@ -385,7 +385,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/verify-email": {
+        "/api/verify-email": {
             "get": {
                 "operationId": "AuthController_verifyEmail",
                 "parameters": [
@@ -410,7 +410,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/resend-verification": {
+        "/api/resend-verification": {
             "post": {
                 "operationId": "AuthController_resendVerification",
                 "parameters": [],
@@ -422,7 +422,7 @@
                 "tags": ["auth"]
             }
         },
-        "/api/auth/change-password": {
+        "/api/change-password": {
             "post": {
                 "operationId": "AuthController_changePassword",
                 "parameters": [],

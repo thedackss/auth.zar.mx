@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const refresh = useCallback(async () => {
         try {
-            setUser(await api<User>("/auth/me"));
+            setUser(await api<User>("/me"));
         } catch {
             setUser(null);
         } finally {
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signOut = useCallback(async () => {
         try {
-            await api("/auth/sign-out", { method: "POST" });
+            await api("/sign-out", { method: "POST" });
         } catch {
             // Session may already be gone; treat as signed out either way.
         }

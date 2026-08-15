@@ -30,7 +30,7 @@ import { EmailVerificationService } from "./email-verification.service";
 import { SetPasswordService } from "./set-password.service";
 
 @ApiTags("auth")
-@Controller("auth")
+@Controller()
 export class AuthController {
     constructor(
         private readonly auth: AuthService,

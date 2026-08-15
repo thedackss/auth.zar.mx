@@ -60,7 +60,7 @@ export class ApiError extends Error {
 
 // The API wraps every response as { data, message }. Cookies ride along
 // automatically because panel and API share the origin (via proxy in dev).
-// Pass paths without the /api prefix: api("/auth/me").
+// Pass paths without the /api prefix: api("/me").
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     const res = await fetch(`/api${path}`, {
         credentials: "same-origin",

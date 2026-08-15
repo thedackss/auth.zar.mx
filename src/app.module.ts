@@ -33,7 +33,7 @@ const panelModule = existsSync(panelDist)
     ? [
           ServeStaticModule.forRoot({
               rootPath: panelDist,
-              exclude: ["/api{/*path}", "/docs{/*path}", "/admin{/*path}"],
+              exclude: ["/api{/*path}", "/docs{/*path}", "/bullmq{/*path}"],
           }),
       ]
     : [];

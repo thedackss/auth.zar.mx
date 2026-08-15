@@ -1,7 +1,7 @@
 # zar-auth
 
 Reusable auth microservice for all zar.mx apps, deployed at `auth.zar.mx`
-(panel at root, API under `/api`; `/docs` and `/admin/queues` stay backend).
+(panel at root, API under `/api`; `/docs` and `/bullmq` stay backend).
 NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
 
 ## Architecture decisions (settled — don't re-litigate)
@@ -34,7 +34,7 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
   never set (a crash-looping server would spam and blacklist the sender);
   recovery is via the password-recover flow.
 - **Email**: Resend, queued through BullMQ. In dev, emails are logged
-  (`[mail:log]`) instead of sent. Bull Board at `/admin/queues` is protected
+  (`[mail:log]`) instead of sent. Bull Board at `/bullmq` is protected
   by our own session auth (any ADMIN), not basic auth.
 - **Language**: English is the default everywhere (panel, API errors, emails).
   Sign-up accepts an optional `lang` (`en`/`es`) stored as `User.locale`;

@@ -41,7 +41,7 @@ A React (Vite) admin panel lives in `panel/` — a plain standalone project, not
 a workspace. The panel is served at the root and the API under `/api`:
 
 - `auth.zar.mx/` → panel (whenever `panel/dist` exists)
-- `auth.zar.mx/api/...` → this API (`/docs` and `/admin/queues` stay backend)
+- `auth.zar.mx/api/...` → this API (`/docs` and `/bullmq` stay backend)
 
 ```bash
 pnpm panel:build   # build panel/dist -> served at http://localhost:3000/
