@@ -65,7 +65,10 @@ export class AppGatewayController {
         }
 
         const user = await this.prisma.client.$transaction(async (tx) => {
-            const created = await this.users.create({ email: body.email }, tx);
+            const created = await this.users.create(
+                { email: body.email, locale: body.lang },
+                tx,
+            );
 
             await this.credentials.passwords.create(
                 { userId: created.id, password: body.password },
@@ -84,7 +87,11 @@ export class AppGatewayController {
             return created;
         });
 
-        await this.verification.issue({ userId: user.id, email: user.email });
+        await this.verification.issue({
+            userId: user.id,
+            email: user.email,
+            locale: user.locale,
+        });
 
         await this.audit.record({
             type: "SIGN_UP",

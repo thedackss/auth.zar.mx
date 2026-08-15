@@ -21,12 +21,12 @@ export class AuthService {
         private readonly settings: SettingsService,
     ) {}
 
-    public async signUp({ email, password }: AuthInput) {
+    public async signUp({ email, password, lang }: AuthInput) {
         if (!(await this.settings.isSignupAllowed()))
             throw new ForbiddenException("Sign-up is currently restricted");
 
         return await this.prisma.client.$transaction(async (tx) => {
-            const user = await this.users.create({ email }, tx);
+            const user = await this.users.create({ email, locale: lang }, tx);
 
             await this.credentials.passwords.create(
                 { userId: user.id, password },

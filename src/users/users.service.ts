@@ -45,13 +45,15 @@ export class UsersService {
         const email = props.email.trim().toLowerCase();
         const client = tx ?? this.prisma.client;
 
-        return await client.user.create({ data: { email } }).catch(
-            this.prisma.catchKnownErrors({
-                P2002: `A user with the same email already exists`,
-                P2003: `Foreign key constraint failed while creating user, please check related data`,
-                P2025: `Related record not found while creating user, please check related data`,
-            }),
-        );
+        return await client.user
+            .create({ data: { email, locale: props.locale } })
+            .catch(
+                this.prisma.catchKnownErrors({
+                    P2002: `A user with the same email already exists`,
+                    P2003: `Foreign key constraint failed while creating user, please check related data`,
+                    P2025: `Related record not found while creating user, please check related data`,
+                }),
+            );
     }
 
     public async update({ id, data }: UpdateUserProps) {

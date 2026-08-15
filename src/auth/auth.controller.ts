@@ -64,7 +64,11 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response,
     ) {
         const user = await this.auth.signUp(body);
-        await this.verification.issue({ userId: user.id, email: user.email });
+        await this.verification.issue({
+            userId: user.id,
+            email: user.email,
+            locale: user.locale,
+        });
 
         const sessionId = await this.sessions.create({ userId: user.id });
         this.setSessionCookie(res, sessionId);
@@ -176,7 +180,7 @@ export class AuthController {
             // Per-user cooldown: repeated requests within 5 minutes send
             // nothing, protecting the inbox and our sender reputation.
             await this.setPasswordService.issueOncePer(
-                { userId: user.id, email: user.email },
+                { userId: user.id, email: user.email, locale: user.locale },
                 "reset",
                 60 * 5,
             );
@@ -249,7 +253,11 @@ export class AuthController {
         if (user.emailVerifiedAt)
             return { data: null, message: "Email is already verified" };
 
-        await this.verification.resend({ userId: user.id, email: user.email });
+        await this.verification.resend({
+            userId: user.id,
+            email: user.email,
+            locale: user.locale,
+        });
         return { data: null, message: "Verification email sent" };
     }
 

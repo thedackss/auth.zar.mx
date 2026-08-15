@@ -9,7 +9,7 @@ export class SignInDto {
     @Transform(({ value }) =>
         typeof value === "string" ? value.trim().toLowerCase() : value,
     )
-    @IsEmail({}, { message: "El correo electrónico no es válido" })
+    @IsEmail({}, { message: "Email address is not valid" })
     @MaxLength(254)
     email: string;
 

@@ -7,6 +7,7 @@ import {
     Logger,
 } from "@nestjs/common";
 import type { Request, Response } from "express";
+import { localizeMessage } from "@/common/i18n";
 import { Prisma } from "@/prisma/generated/client";
 
 @Catch()
@@ -18,7 +19,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const res = ctx.getResponse<Response>();
         const req = ctx.getRequest<Request>();
 
-        const { status, message } = this.normalize(exception);
+        const lang = req.headers["x-lang"];
+        const { status, message } = this.normalize(exception, lang);
 
         if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
             this.logger.error(
@@ -35,13 +37,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         });
     }
 
-    private normalize(exception: unknown) {
+    private normalize(exception: unknown, lang: unknown) {
         if (exception instanceof HttpException) {
             const response = exception.getResponse();
             let message: string;
 
             if (typeof response === "string") {
-                message = response;
+                message = localizeMessage(response, lang);
             } else if (
                 typeof response === "object" &&
                 response !== null &&
@@ -50,10 +52,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 const raw = (response as { message?: string | string[] })
                     .message;
                 message = Array.isArray(raw)
-                    ? raw.join(", ")
-                    : (raw ?? exception.message);
+                    ? raw.map((m) => localizeMessage(m, lang)).join(", ")
+                    : localizeMessage(raw ?? exception.message, lang);
             } else {
-                message = exception.message;
+                message = localizeMessage(exception.message, lang);
             }
 
             return { status: exception.getStatus(), message };

@@ -1,944 +1,1039 @@
 {
-    "openapi": "3.0.0",
-    "paths": {
-        "/api": {
-            "get": {
-                "operationId": "AppController_getHello",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": ["App"]
-            }
-        },
-        "/api/health": {
-            "get": {
-                "operationId": "HealthController_check",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["health"]
-            }
-        },
-        "/api/audit/events": {
-            "get": {
-                "operationId": "AuditController_findAll",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "required": false,
-                        "in": "query",
-                        "description": "Filter by the affected user's id.",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "type",
-                        "required": false,
-                        "in": "query",
-                        "description": "Filter by event type.",
-                        "schema": {
-                            "example": "SIGN_IN_FAILURE",
-                            "type": "string",
-                            "enum": [
-                                "SIGN_UP",
-                                "SIGN_IN_SUCCESS",
-                                "SIGN_IN_FAILURE",
-                                "SIGN_OUT",
-                                "SIGN_OUT_ALL",
-                                "EMAIL_VERIFIED",
-                                "PASSWORD_SET",
-                                "PASSWORD_CHANGED",
-                                "PASSWORD_RECOVER_REQUESTED",
-                                "ROLE_CHANGED",
-                                "ACCOUNT_DISABLED",
-                                "ACCOUNT_ENABLED",
-                                "APP_CREATED",
-                                "APP_UPDATED",
-                                "APP_KEY_REGENERATED",
-                                "APP_REVOKED",
-                                "APP_ACCESS_GRANTED",
-                                "APP_ACCESS_REVOKED",
-                                "APP_TOKEN_DENIED"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "required": false,
-                        "in": "query",
-                        "description": "Filter by the email recorded on the event (useful for failed\nsign-ins against unknown accounts).",
-                        "schema": {
-                            "format": "email",
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "required": true,
-                        "in": "query",
-                        "description": "Page to retrieve (from 1).",
-                        "schema": {
-                            "minimum": 1,
-                            "default": 1,
-                            "example": 1,
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "required": true,
-                        "in": "query",
-                        "description": "Items per page (max 100).",
-                        "schema": {
-                            "minimum": 1,
-                            "maximum": 100,
-                            "default": 20,
-                            "example": 20,
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["audit"]
-            }
-        },
-        "/api/users": {
-            "get": {
-                "operationId": "UsersController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["users"]
-            }
-        },
-        "/api/users/{id}": {
-            "get": {
-                "operationId": "UsersController_findOne",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["users"]
-            }
-        },
-        "/api/users/{id}/role": {
-            "patch": {
-                "operationId": "UsersController_setRole",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateUserRoleDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["users"]
-            }
-        },
-        "/api/users/{id}/disable": {
-            "post": {
-                "operationId": "UsersController_disable",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["users"]
-            }
-        },
-        "/api/users/{id}/enable": {
-            "post": {
-                "operationId": "UsersController_enable",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["users"]
-            }
-        },
-        "/api/auth/me": {
-            "get": {
-                "operationId": "AuthController_me",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/sign-up": {
-            "post": {
-                "operationId": "AuthController_signUp",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SignUpDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/sign-in": {
-            "post": {
-                "operationId": "AuthController_signIn",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SignInDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/sign-out": {
-            "post": {
-                "operationId": "AuthController_signOut",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/sign-out-all": {
-            "post": {
-                "operationId": "AuthController_signOutAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/recover-password": {
-            "post": {
-                "operationId": "AuthController_recoverPassword",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RecoverPasswordDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/set-password": {
-            "post": {
-                "operationId": "AuthController_setPassword",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SetPasswordDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/verify-email": {
-            "get": {
-                "operationId": "AuthController_verifyEmail",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "required": true,
-                        "in": "query",
-                        "description": "Single-use verification token from the email link.",
-                        "schema": {
-                            "minLength": 16,
-                            "maxLength": 256,
-                            "example": "kJ8xq2rP-nV4wYt1aZ7bC3dE6fG9hL0m",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/resend-verification": {
-            "post": {
-                "operationId": "AuthController_resendVerification",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/auth/change-password": {
-            "post": {
-                "operationId": "AuthController_changePassword",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ChangePasswordDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["auth"]
-            }
-        },
-        "/api/settings": {
-            "get": {
-                "operationId": "SettingsController_get",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["settings"]
-            },
-            "patch": {
-                "operationId": "SettingsController_update",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateSettingsDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "security": [
-                    {
-                        "cookie": []
-                    }
-                ],
-                "tags": ["settings"]
-            }
-        },
-        "/api/apps": {
-            "get": {
-                "operationId": "AppsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            },
-            "post": {
-                "operationId": "AppsController_create",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateAppDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            }
-        },
-        "/api/apps/{id}": {
-            "patch": {
-                "operationId": "AppsController_update",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateAppDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            },
-            "delete": {
-                "operationId": "AppsController_remove",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            }
-        },
-        "/api/apps/{id}/key": {
-            "post": {
-                "operationId": "AppsController_regenerateKey",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            }
-        },
-        "/api/apps/{id}/revoke": {
-            "post": {
-                "operationId": "AppsController_revoke",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            }
-        },
-        "/api/apps/{id}/access": {
-            "get": {
-                "operationId": "AppsController_listAccess",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            },
-            "post": {
-                "operationId": "AppsController_grant",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/GrantAccessDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            }
-        },
-        "/api/apps/{id}/access/{accessId}": {
-            "delete": {
-                "operationId": "AppsController_revokeAccess",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "accessId",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "format": "uuid",
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["apps"]
-            }
-        },
-        "/api/app/sign-up": {
-            "post": {
-                "operationId": "AppGatewayController_signUp",
-                "parameters": [
-                    {
-                        "name": "X-App-Key",
-                        "in": "header",
-                        "description": "The calling app's API key",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SignUpDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                },
-                "tags": ["app"]
-            }
-        },
-        "/api/app/token": {
-            "post": {
-                "operationId": "AppGatewayController_token",
-                "parameters": [
-                    {
-                        "name": "X-App-Key",
-                        "in": "header",
-                        "description": "The calling app's API key",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": ["app"]
-            }
-        }
-    },
-    "info": {
-        "title": "Zar Auth API",
-        "description": "Authentication and authorization service for zar.mx",
-        "version": "1.0",
-        "contact": {}
-    },
-    "tags": [],
-    "servers": [],
-    "components": {
-        "securitySchemes": {
-            "cookie": {
-                "type": "apiKey",
-                "in": "cookie",
-                "name": "zar.session.id"
-            }
-        },
-        "schemas": {
-            "UpdateUserRoleDto": {
-                "type": "object",
-                "properties": {
-                    "role": {
-                        "type": "string",
-                        "description": "Role to assign to the user.",
-                        "example": "ADMIN",
-                        "enum": ["USER", "ADMIN"]
-                    }
-                },
-                "required": ["role"]
-            },
-            "SignUpDto": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "description": "Email address for the new account. Normalized to lowercase.",
-                        "example": "empleado@hotel.com",
-                        "maxLength": 254,
-                        "format": "email"
-                    },
-                    "password": {
-                        "type": "string",
-                        "description": "Account password. Must be strong: mix of upper/lowercase, number, and symbol.",
-                        "example": "{{password}}",
-                        "maxLength": 128
-                    }
-                },
-                "required": ["email", "password"]
-            },
-            "SignInDto": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "description": "Email address of the account.",
-                        "example": "empleado@hotel.com",
-                        "maxLength": 254,
-                        "format": "email"
-                    },
-                    "password": {
-                        "type": "string",
-                        "description": "Account password.",
-                        "example": "{{password}}",
-                        "minLength": 1,
-                        "maxLength": 128
-                    }
-                },
-                "required": ["email", "password"]
-            },
-            "RecoverPasswordDto": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "description": "Email address of the account to recover.",
-                        "example": "user@example.com",
-                        "maxLength": 254,
-                        "format": "email"
-                    }
-                },
-                "required": ["email"]
-            },
-            "SetPasswordDto": {
-                "type": "object",
-                "properties": {
-                    "token": {
-                        "type": "string",
-                        "description": "Single-use token from the invitation email.",
-                        "example": "kJ8xq2rP-nV4wYt1aZ7bC3dE6fG9hL0m",
-                        "minLength": 16,
-                        "maxLength": 256
-                    },
-                    "password": {
-                        "type": "string",
-                        "description": "New password. Must be strong: mix of upper/lowercase, number, and symbol.",
-                        "example": "{{password}}",
-                        "maxLength": 128
-                    }
-                },
-                "required": ["token", "password"]
-            },
-            "ChangePasswordDto": {
-                "type": "object",
-                "properties": {
-                    "currentPassword": {
-                        "type": "string",
-                        "description": "The account's current password.",
-                        "example": "{{password}}",
-                        "minLength": 1,
-                        "maxLength": 128
-                    },
-                    "newPassword": {
-                        "type": "string",
-                        "description": "New password. Must be strong: mix of upper/lowercase, number, and symbol.",
-                        "example": "{{newPassword}}",
-                        "maxLength": 128
-                    }
-                },
-                "required": ["currentPassword", "newPassword"]
-            },
-            "UpdateSettingsDto": {
-                "type": "object",
-                "properties": {
-                    "signupEnabled": {
-                        "type": "boolean",
-                        "description": "Allows direct public sign-up on auth.zar.mx itself. App-mediated\nsign-up is governed per app, not by this flag.",
-                        "example": false
-                    }
+  "openapi": "3.0.0",
+  "paths": {
+    "/api": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
                 }
-            },
-            "CreateAppDto": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "example": "anyxa",
-                        "minLength": 2,
-                        "maxLength": 64
-                    },
-                    "url": {
-                        "type": "string",
-                        "example": "https://app.domain.tld",
-                        "maxLength": 255,
-                        "format": "uri"
-                    },
-                    "public": {
-                        "type": "boolean",
-                        "description": "Public apps accept any zar user; private apps require access grants.",
-                        "example": false
-                    }
-                },
-                "required": ["name", "public"]
-            },
-            "UpdateAppDto": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "example": "anyxa",
-                        "minLength": 2,
-                        "maxLength": 64
-                    },
-                    "url": {
-                        "type": "string",
-                        "example": "https://app.domain.tld",
-                        "maxLength": 255,
-                        "format": "uri"
-                    },
-                    "public": {
-                        "type": "boolean",
-                        "description": "Public apps accept any zar user; private apps require access grants.",
-                        "example": false
-                    }
-                }
-            },
-            "GrantAccessDto": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "description": "Email to grant. Binds to the existing user with that email, or\npre-authorizes the email to sign up through this app.",
-                        "example": "user@example.com",
-                        "maxLength": 254,
-                        "format": "email"
-                    }
-                },
-                "required": ["email"]
+              }
             }
-        }
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/audit/events": {
+      "get": {
+        "operationId": "AuditController_findAll",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by the affected user's id.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by event type.",
+            "schema": {
+              "example": "SIGN_IN_FAILURE",
+              "type": "string",
+              "enum": [
+                "SIGN_UP",
+                "SIGN_IN_SUCCESS",
+                "SIGN_IN_FAILURE",
+                "SIGN_OUT",
+                "SIGN_OUT_ALL",
+                "EMAIL_VERIFIED",
+                "PASSWORD_SET",
+                "PASSWORD_CHANGED",
+                "PASSWORD_RECOVER_REQUESTED",
+                "ROLE_CHANGED",
+                "ACCOUNT_DISABLED",
+                "ACCOUNT_ENABLED",
+                "APP_CREATED",
+                "APP_UPDATED",
+                "APP_KEY_REGENERATED",
+                "APP_REVOKED",
+                "APP_ACCESS_GRANTED",
+                "APP_ACCESS_REVOKED",
+                "APP_TOKEN_DENIED"
+              ]
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "description": "Filter by the email recorded on the event (useful for failed\nsign-ins against unknown accounts).",
+            "schema": {
+              "format": "email",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "Page to retrieve (from 1).",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "description": "Items per page (max 100).",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "audit"
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/role": {
+      "patch": {
+        "operationId": "UsersController_setRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/disable": {
+      "post": {
+        "operationId": "UsersController_disable",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/enable": {
+      "post": {
+        "operationId": "UsersController_enable",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-up": {
+      "post": {
+        "operationId": "AuthController_signUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-in": {
+      "post": {
+        "operationId": "AuthController_signIn",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-out": {
+      "post": {
+        "operationId": "AuthController_signOut",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-out-all": {
+      "post": {
+        "operationId": "AuthController_signOutAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/recover-password": {
+      "post": {
+        "operationId": "AuthController_recoverPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoverPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/set-password": {
+      "post": {
+        "operationId": "AuthController_setPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/verify-email": {
+      "get": {
+        "operationId": "AuthController_verifyEmail",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "description": "Single-use verification token from the email link.",
+            "schema": {
+              "minLength": 16,
+              "maxLength": 256,
+              "example": "kJ8xq2rP-nV4wYt1aZ7bC3dE6fG9hL0m",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/resend-verification": {
+      "post": {
+        "operationId": "AuthController_resendVerification",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "operationId": "AuthController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "operationId": "SettingsController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "operationId": "SettingsController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/apps": {
+      "get": {
+        "operationId": "AppsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      },
+      "post": {
+        "operationId": "AppsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      }
+    },
+    "/api/apps/{id}": {
+      "patch": {
+        "operationId": "AppsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAppDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      },
+      "delete": {
+        "operationId": "AppsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      }
+    },
+    "/api/apps/{id}/key": {
+      "post": {
+        "operationId": "AppsController_regenerateKey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      }
+    },
+    "/api/apps/{id}/revoke": {
+      "post": {
+        "operationId": "AppsController_revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      }
+    },
+    "/api/apps/{id}/access": {
+      "get": {
+        "operationId": "AppsController_listAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      },
+      "post": {
+        "operationId": "AppsController_grant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      }
+    },
+    "/api/apps/{id}/access/{accessId}": {
+      "delete": {
+        "operationId": "AppsController_revokeAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "accessId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "apps"
+        ]
+      }
+    },
+    "/api/app/sign-up": {
+      "post": {
+        "operationId": "AppGatewayController_signUp",
+        "parameters": [
+          {
+            "name": "X-App-Key",
+            "in": "header",
+            "description": "The calling app's API key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "app"
+        ]
+      }
+    },
+    "/api/app/token": {
+      "post": {
+        "operationId": "AppGatewayController_token",
+        "parameters": [
+          {
+            "name": "X-App-Key",
+            "in": "header",
+            "description": "The calling app's API key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "app"
+        ]
+      }
     }
+  },
+  "info": {
+    "title": "Zar Auth API",
+    "description": "Authentication and authorization service for zar.mx",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "zar.session.id"
+      }
+    },
+    "schemas": {
+      "UpdateUserRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "Role to assign to the user.",
+            "example": "ADMIN",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "SignUpDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address for the new account. Normalized to lowercase.",
+            "example": "user@domain.tld",
+            "maxLength": 254,
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "Account password. Must be strong: mix of upper/lowercase, number, and symbol.",
+            "example": "{{password}}",
+            "maxLength": 128
+          },
+          "lang": {
+            "description": "Language for the account's emails (\"en\" default). Consumer apps pass\nthe language of the page the user signed up from.",
+            "example": "es",
+            "enum": [
+              "en",
+              "es"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SignInDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address of the account.",
+            "example": "empleado@hotel.com",
+            "maxLength": 254,
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "Account password.",
+            "example": "{{password}}",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RecoverPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address of the account to recover.",
+            "example": "user@example.com",
+            "maxLength": 254,
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "SetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Single-use token from the invitation email.",
+            "example": "kJ8xq2rP-nV4wYt1aZ7bC3dE6fG9hL0m",
+            "minLength": 16,
+            "maxLength": 256
+          },
+          "password": {
+            "type": "string",
+            "description": "New password. Must be strong: mix of upper/lowercase, number, and symbol.",
+            "example": "{{password}}",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "The account's current password.",
+            "example": "{{password}}",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "New password. Must be strong: mix of upper/lowercase, number, and symbol.",
+            "example": "{{newPassword}}",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "UpdateSettingsDto": {
+        "type": "object",
+        "properties": {
+          "signupEnabled": {
+            "type": "boolean",
+            "description": "Allows direct public sign-up on auth.zar.mx itself. App-mediated\nsign-up is governed per app, not by this flag.",
+            "example": false
+          }
+        }
+      },
+      "CreateAppDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "anyxa",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "url": {
+            "type": "string",
+            "example": "https://app.domain.tld",
+            "maxLength": 255,
+            "format": "uri"
+          },
+          "public": {
+            "type": "boolean",
+            "description": "Public apps accept any zar user; private apps require access grants.",
+            "example": false
+          }
+        },
+        "required": [
+          "name",
+          "public"
+        ]
+      },
+      "UpdateAppDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "anyxa",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "url": {
+            "type": "string",
+            "example": "https://app.domain.tld",
+            "maxLength": 255,
+            "format": "uri"
+          },
+          "public": {
+            "type": "boolean",
+            "description": "Public apps accept any zar user; private apps require access grants.",
+            "example": false
+          }
+        }
+      },
+      "GrantAccessDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email to grant. Binds to the existing user with that email, or\npre-authorizes the email to sign up through this app.",
+            "example": "user@example.com",
+            "maxLength": 254,
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      }
+    }
+  }
 }

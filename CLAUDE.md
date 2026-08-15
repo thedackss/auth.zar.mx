@@ -36,6 +36,13 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
 - **Email**: Resend, queued through BullMQ. In dev, emails are logged
   (`[mail:log]`) instead of sent. Bull Board at `/admin/queues` is protected
   by our own session auth (any ADMIN), not basic auth.
+- **Language**: English is the default everywhere (panel, API errors, emails).
+  Sign-up accepts an optional `lang` (`en`/`es`) stored as `User.locale`;
+  all emails to that user render in it. User-facing API error messages are
+  translated by `AllExceptionsFilter` via the `src/common/i18n.ts` catalog
+  (keyed by the exact English text) when the request carries `X-Lang: es` —
+  consumer apps set that header per page language; the panel never sends it,
+  so the admin UI stays English.
 
 ## Panel (`panel/`)
 

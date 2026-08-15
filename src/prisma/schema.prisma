@@ -24,6 +24,9 @@ model User {
 
   role Role @default(USER)
 
+  // Email language, captured at sign-up ("lang" in the sign-up body).
+  locale String @default("en")
+
   emailVerifiedAt DateTime? @map("email_verified_at")
   disabledAt      DateTime? @map("disabled_at")
 

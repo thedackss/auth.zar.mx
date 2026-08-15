@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { BadRequestException, Injectable } from "@nestjs/common";
+import { asLocale, type Locale } from "@/common/locale";
 import { CredentialsService } from "@/credentials/credentials.service";
 import { EmailService } from "@/email/email.service";
 import { env } from "@/env";
@@ -8,6 +9,51 @@ import { UsersService } from "@/users/users.service";
 import { VerificationInput } from "./interfaces/verification-input.interface";
 
 const SET_PASSWORD_TTL_SECONDS = 60 * 60 * 24; // 24 hours
+
+const TEMPLATES: Record<
+    Locale,
+    {
+        action: string;
+        actionText: string;
+        link: string;
+        expires: string;
+        invite: { subject: string; intro: string; ignore: string };
+        reset: { subject: string; intro: string; ignore: string };
+    }
+> = {
+    en: {
+        action: "Set your password by clicking the link below:",
+        actionText: "Set your password by visiting this link:",
+        link: "Set password",
+        expires: "This link expires in 24 hours.",
+        invite: {
+            subject: "Set your Zar password",
+            intro: "You have been invited to Zar.",
+            ignore: "If you were not expecting this invitation, you can ignore this message.",
+        },
+        reset: {
+            subject: "Reset your Zar password",
+            intro: "We received a request to reset your Zar password.",
+            ignore: "If you did not request this change, you can ignore this message; your current password will keep working.",
+        },
+    },
+    es: {
+        action: "Establece tu contraseña haciendo clic en el siguiente enlace:",
+        actionText: "Establece tu contraseña visitando este enlace:",
+        link: "Establecer contraseña",
+        expires: "Este enlace caduca en 24 horas.",
+        invite: {
+            subject: "Establece tu contraseña de Zar",
+            intro: "Has sido invitado a Zar.",
+            ignore: "Si no esperabas esta invitación, puedes ignorar este mensaje.",
+        },
+        reset: {
+            subject: "Restablece tu contraseña de Zar",
+            intro: "Recibimos una solicitud para restablecer tu contraseña de Zar.",
+            ignore: "Si no solicitaste este cambio, puedes ignorar este mensaje; tu contraseña actual seguirá funcionando.",
+        },
+    },
+};
 
 @Injectable()
 export class SetPasswordService {
@@ -26,45 +72,35 @@ export class SetPasswordService {
         return randomBytes(32).toString("base64url");
     }
 
-    private template(kind: "invite" | "reset") {
-        const intro =
-            kind === "invite"
-                ? "Has sido invitado a Zar."
-                : "Recibimos una solicitud para restablecer tu contraseña de Zar.";
-        const subject =
-            kind === "invite"
-                ? "Establece tu contraseña de Zar"
-                : "Restablece tu contraseña de Zar";
-        const ignore =
-            kind === "invite"
-                ? "Si no esperabas esta invitación, puedes ignorar este mensaje."
-                : "Si no solicitaste este cambio, puedes ignorar este mensaje; tu contraseña actual seguirá funcionando.";
+    private template(kind: "invite" | "reset", locale: Locale) {
+        const t = TEMPLATES[locale][kind];
+        const common = TEMPLATES[locale];
 
         function html(url: string) {
             return `
-            <p>${intro}</p>
-            <p>Establece tu contraseña haciendo clic en el siguiente enlace:</p>
-            <p><a href="${url}">Establecer contraseña</a></p>
-            <p>Este enlace caduca en 24 horas. ${ignore}</p>
+            <p>${t.intro}</p>
+            <p>${common.action}</p>
+            <p><a href="${url}">${common.link}</a></p>
+            <p>${common.expires} ${t.ignore}</p>
             `.trim();
         }
 
         function text(url: string) {
             return `
-            ${intro}
+            ${t.intro}
 
-            Establece tu contraseña visitando este enlace:
+            ${common.actionText}
             ${url}
 
-            Este enlace caduca en 24 horas. ${ignore}
+            ${common.expires} ${t.ignore}
             `.trim();
         }
 
-        return { subject, html, text };
+        return { subject: t.subject, html, text };
     }
 
     public async issue(
-        { userId, email }: VerificationInput,
+        { userId, email, locale }: VerificationInput,
         kind: "invite" | "reset" = "invite",
     ): Promise<void> {
         const token = this.generateToken();
@@ -76,7 +112,7 @@ export class SetPasswordService {
         );
 
         const url = `${env.APP_URL}/auth/set-password?token=${token}`;
-        const template = this.template(kind);
+        const template = this.template(kind, asLocale(locale));
 
         await this.email.send({
             to: email,
@@ -117,7 +153,7 @@ export class SetPasswordService {
 
         if (!userId)
             throw new BadRequestException(
-                "El enlace para establecer la contraseña no es válido o ha caducado",
+                "The set-password link is invalid or has expired",
             );
 
         // set (upsert), not create: the same flow serves first-time invites
