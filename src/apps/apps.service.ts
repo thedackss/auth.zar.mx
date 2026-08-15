@@ -39,6 +39,41 @@ export class AppsService {
         return createHash("sha256").update(key).digest("hex");
     }
 
+    // Origins of registered (non-revoked) app urls, cached briefly so the
+    // CORS callback does not hit the database on every request.
+    private originsCache: { at: number; origins: Set<string> } | null = null;
+    private static readonly ORIGINS_CACHE_TTL_MS = 60_000;
+
+    public async isAllowedOrigin(origin: string): Promise<boolean> {
+        const cache = this.originsCache;
+
+        if (
+            !cache ||
+            Date.now() - cache.at > AppsService.ORIGINS_CACHE_TTL_MS
+        ) {
+            const apps = await this.prisma.client.app.findMany({
+                where: { revokedAt: null, url: { not: null } },
+                select: { url: true },
+            });
+
+            const origins = new Set<string>();
+            for (const app of apps) {
+                if (!app.url) continue;
+                try {
+                    origins.add(new URL(app.url).origin);
+                } catch {
+                    // Ignore malformed urls; they simply never match.
+                }
+            }
+
+            this.originsCache = { at: Date.now(), origins };
+        }
+
+        return (this.originsCache as NonNullable<typeof cache>).origins.has(
+            origin,
+        );
+    }
+
     private generateKey(): string {
         return `${KEY_PREFIX}${randomBytes(32).toString("hex")}`;
     }
