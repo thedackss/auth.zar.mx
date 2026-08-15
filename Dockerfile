@@ -29,8 +29,11 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
 COPY src/prisma ./src/prisma
 RUN pnpm install --frozen-lockfile
 
+# Regenerate the client with the full source (tsconfig) in place: without it,
+# generate emits .ts-extension imports that survive into dist and crash at
+# runtime. The postinstall run above only warms the cache.
 COPY . .
-RUN pnpm build
+RUN pnpm prisma generate && pnpm build
 
 # --- runtime stage ---
 FROM node:24-bookworm-slim
