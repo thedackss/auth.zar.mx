@@ -1,0 +1,12 @@
+.git
+node_modules
+dist
+coverage
+panel/node_modules
+panel/dist
+panel/.tanstack
+.env
+*.local
+bruno
+test
+README.md
