@@ -136,6 +136,7 @@ export class AuthController {
             await this.audit.record({
                 type: "SIGN_OUT",
                 userId: req.user.id,
+                email: req.user.email,
                 ...requestMeta(req),
             });
         }
@@ -157,6 +158,7 @@ export class AuthController {
         await this.audit.record({
             type: "SIGN_OUT_ALL",
             userId: user.id,
+            email: user.email,
             ...requestMeta(req),
         });
         return {
@@ -280,6 +282,7 @@ export class AuthController {
         await this.audit.record({
             type: "PASSWORD_CHANGED",
             userId: user.id,
+            email: user.email,
             ...requestMeta(req),
         });
 

@@ -69,6 +69,7 @@ export class UsersController {
         await this.audit.record({
             type: "ROLE_CHANGED",
             userId: id,
+            email: data.email,
             actorId: currentUser.id,
             metadata: { from: previous.role, to: body.role },
             ...requestMeta(req),
@@ -100,6 +101,7 @@ export class UsersController {
         await this.audit.record({
             type: "ACCOUNT_DISABLED",
             userId: id,
+            email: data.email,
             actorId: currentUser.id,
             ...requestMeta(req),
         });
@@ -126,6 +128,7 @@ export class UsersController {
         await this.audit.record({
             type: "ACCOUNT_ENABLED",
             userId: id,
+            email: data.email,
             actorId: currentUser.id,
             ...requestMeta(req),
         });
