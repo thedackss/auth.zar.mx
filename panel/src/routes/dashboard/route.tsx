@@ -58,6 +58,9 @@ function DashboardLayout() {
                             >
                                 audit
                             </Link>
+                            {/* Bull Board is served by the backend, outside
+                                the SPA, so a plain anchor. */}
+                            <a href="/bullmq">bullmq</a>
                         </>
                     )}
                     <Link

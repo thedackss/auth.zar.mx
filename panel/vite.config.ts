@@ -22,6 +22,8 @@ export default defineConfig({
     server: {
         proxy: {
             "/api": "http://localhost:3000",
+            // Bull Board (backend-served) so the nav link works in dev too.
+            "/bullmq": "http://localhost:3000",
         },
     },
 });
