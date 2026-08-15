@@ -4,13 +4,14 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { ServeStaticModule } from "@nestjs/serve-static";
-import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { ThrottlerModule } from "@nestjs/throttler";
 import { LoggerModule } from "nestjs-pino";
 import { AppController } from "@/app.controller";
 import { AppService } from "@/app.service";
 import { AppsModule } from "@/apps/apps.module";
 import { AuditModule } from "@/audit/audit.module";
 import { AuthModule } from "@/auth/auth.module";
+import { ClientIpThrottlerGuard } from "@/common/guards/client-ip-throttler.guard";
 import { loggerConfig } from "@/common/logger/logger.config";
 import { CredentialsModule } from "@/credentials/credentials.module";
 import { EmailModule } from "@/email/email.module";
@@ -72,7 +73,7 @@ const panelModule = existsSync(panelDist)
     controllers: [AppController, HealthController],
     providers: [
         AppService,
-        { provide: APP_GUARD, useClass: ThrottlerGuard },
+        { provide: APP_GUARD, useClass: ClientIpThrottlerGuard },
         { provide: APP_GUARD, useClass: SessionExtractGuard },
     ],
 })
