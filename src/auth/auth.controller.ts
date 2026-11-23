@@ -214,6 +214,10 @@ export class AuthController {
             body.password,
         );
 
+        // A reset is what a user reaches for after a compromise: nothing
+        // signed in before it may survive.
+        await this.sessions.destroyAll(user.id);
+
         await this.audit.record({
             type: "PASSWORD_SET",
             userId: user.id,
@@ -222,7 +226,8 @@ export class AuthController {
         });
         return {
             data: user,
-            message: "Password set successfully. You can now sign in.",
+            message:
+                "Password set successfully. All existing sessions were signed out.",
         };
     }
 
