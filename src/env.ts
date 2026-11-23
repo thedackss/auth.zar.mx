@@ -23,7 +23,8 @@ const EnvSchema = z.object({
     REDIS_URL: z.url(),
     DATABASE_URL: z.url(),
 
-    AUTH_SECRET: z.string().min(16),
+    // HS256 key: at least 256 bits of input (openssl rand -base64 32 gives 44).
+    AUTH_SECRET: z.string().min(32),
     // Lifetime of the short-lived JWTs minted by POST /auth/token.
     JWT_TTL_SECONDS: z.coerce.number().int().positive().default(60),
     SESSION_TTL_SECONDS: z.coerce
