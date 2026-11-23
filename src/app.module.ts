@@ -12,6 +12,7 @@ import { AppsModule } from "@/apps/apps.module";
 import { AuditModule } from "@/audit/audit.module";
 import { AuthModule } from "@/auth/auth.module";
 import { ClientIpThrottlerGuard } from "@/common/guards/client-ip-throttler.guard";
+import { CsrfOriginGuard } from "@/common/guards/csrf-origin.guard";
 import { loggerConfig } from "@/common/logger/logger.config";
 import { CredentialsModule } from "@/credentials/credentials.module";
 import { EmailModule } from "@/email/email.module";
@@ -74,6 +75,7 @@ const panelModule = existsSync(panelDist)
     providers: [
         AppService,
         { provide: APP_GUARD, useClass: ClientIpThrottlerGuard },
+        { provide: APP_GUARD, useClass: CsrfOriginGuard },
         { provide: APP_GUARD, useClass: SessionExtractGuard },
     ],
 })
