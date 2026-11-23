@@ -119,6 +119,7 @@ model AuthCredential {
 
 enum AuthEventType {
   SIGN_UP
+  SIGN_UP_FAILURE
   SIGN_IN_SUCCESS
   SIGN_IN_FAILURE
   SIGN_OUT

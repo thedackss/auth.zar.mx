@@ -3,6 +3,7 @@ import {
     Controller,
     Get,
     HttpCode,
+    HttpException,
     HttpStatus,
     Post,
     Query,
@@ -49,6 +50,11 @@ export class AuthController {
         });
     }
 
+    /** Short, non-sensitive description of a failed attempt for the audit log. */
+    private reason(error: unknown): string {
+        return error instanceof HttpException ? error.message : "error";
+    }
+
     @Get("me")
     @Authenticated()
     public async me(@CurrentUser() data: User) {
@@ -63,7 +69,19 @@ export class AuthController {
         @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
     ) {
-        const user = await this.auth.signUp(body);
+        let user: User;
+        try {
+            user = await this.auth.signUp(body);
+        } catch (error) {
+            await this.audit.record({
+                type: "SIGN_UP_FAILURE",
+                email: body.email,
+                metadata: { reason: this.reason(error) },
+                ...requestMeta(req),
+            });
+            throw error;
+        }
+
         await this.verification.issue({
             userId: user.id,
             email: user.email,

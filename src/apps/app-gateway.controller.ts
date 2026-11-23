@@ -3,6 +3,7 @@ import {
     Controller,
     ForbiddenException,
     HttpCode,
+    HttpException,
     HttpStatus,
     Post,
     Req,
@@ -55,6 +56,47 @@ export class AppGatewayController {
         @Body() body: SignUpDto,
         @Req() req: Request,
     ) {
+        let user: User;
+        try {
+            user = await this.register(app, body);
+        } catch (error) {
+            await this.audit.record({
+                type: "SIGN_UP_FAILURE",
+                email: body.email,
+                metadata: {
+                    appId: app.id,
+                    appName: app.name,
+                    reason:
+                        error instanceof HttpException
+                            ? error.message
+                            : "error",
+                },
+                ...requestMeta(req),
+            });
+            throw error;
+        }
+
+        await this.verification.issue({
+            userId: user.id,
+            email: user.email,
+            locale: user.locale,
+        });
+
+        await this.audit.record({
+            type: "SIGN_UP",
+            userId: user.id,
+            email: user.email,
+            metadata: { appId: app.id, appName: app.name },
+            ...requestMeta(req),
+        });
+
+        return {
+            data: user,
+            message: `User (${user.email}) created successfully. A verification email has been sent.`,
+        };
+    }
+
+    private async register(app: App, body: SignUpDto): Promise<User> {
         if (
             !app.public &&
             !(await this.apps.hasEmailGrant(app.id, body.email))
@@ -64,7 +106,7 @@ export class AppGatewayController {
             );
         }
 
-        const user = await this.prisma.client.$transaction(async (tx) => {
+        return this.prisma.client.$transaction(async (tx) => {
             const created = await this.users.create(
                 { email: body.email, locale: body.lang },
                 tx,
@@ -86,25 +128,6 @@ export class AppGatewayController {
 
             return created;
         });
-
-        await this.verification.issue({
-            userId: user.id,
-            email: user.email,
-            locale: user.locale,
-        });
-
-        await this.audit.record({
-            type: "SIGN_UP",
-            userId: user.id,
-            email: user.email,
-            metadata: { appId: app.id, appName: app.name },
-            ...requestMeta(req),
-        });
-
-        return {
-            data: user,
-            message: `User (${user.email}) created successfully. A verification email has been sent.`,
-        };
     }
 
     @Post("token")
