@@ -2,6 +2,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { Logger } from "nestjs-pino";
 import { AppModule } from "@/app.module";
 import { AppsService } from "@/apps/apps.service";
@@ -20,6 +21,42 @@ async function bootstrap() {
     app.enableShutdownHooks();
     app.setGlobalPrefix("api");
     app.set("trust proxy", 1);
+    // Security headers for the panel, the API and Bull Board. The CSP allows
+    // what those actually use: same-origin scripts (Bull Board's config is a
+    // non-executable application/json script), inline style attributes
+    // (React and Bull Board) and the panel's Google font. Swagger UI needs
+    // inline scripts, so the CSP is dev-off along with it.
+    app.use(
+        helmet({
+            contentSecurityPolicy:
+                env.NODE_ENV === "production"
+                    ? {
+                          directives: {
+                              defaultSrc: ["'self'"],
+                              scriptSrc: ["'self'"],
+                              styleSrc: [
+                                  "'self'",
+                                  "'unsafe-inline'",
+                                  "https://fonts.googleapis.com",
+                              ],
+                              fontSrc: [
+                                  "'self'",
+                                  "https://fonts.gstatic.com",
+                                  "data:",
+                              ],
+                              imgSrc: ["'self'", "data:"],
+                              connectSrc: ["'self'"],
+                              frameAncestors: ["'none'"],
+                              objectSrc: ["'none'"],
+                              baseUri: ["'self'"],
+                              formAction: ["'self'"],
+                          },
+                      }
+                    : false,
+            // Cloudflare already sets HSTS at the edge.
+            strictTransportSecurity: false,
+        }),
+    );
     // Allowed origins: the static env list plus the urls of registered
     // (non-revoked) apps, so new apps work without touching CORS_ORIGINS.
     const apps = app.get(AppsService);
