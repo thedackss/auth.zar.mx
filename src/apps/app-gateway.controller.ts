@@ -116,6 +116,15 @@ export class AppGatewayController {
         @CurrentUser() user: User,
         @Req() req: Request,
     ) {
+        // Private-app grants are keyed by email, so the email must be proven:
+        // otherwise anyone could sign up with a pre-authorized address (or
+        // pre-register it on auth.zar.mx) and inherit the grant.
+        if (!app.public && !user.emailVerifiedAt) {
+            throw new ForbiddenException(
+                "Verify your email address before accessing this app",
+            );
+        }
+
         if (!(await this.apps.hasAccess(app, user.id))) {
             await this.audit.record({
                 type: "APP_TOKEN_DENIED",

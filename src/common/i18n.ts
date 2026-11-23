@@ -31,6 +31,8 @@ const ES: Record<string, string> = {
         "Esta app es privada y ese correo no está autorizado para registrarse",
     "This account does not have access to this app":
         "Esta cuenta no tiene acceso a esta app",
+    "Verify your email address before accessing this app":
+        "Verifica tu correo electrónico antes de acceder a esta app",
 
     // validation (custom messages on DTOs)
     "Email address is not valid": "El correo electrónico no es válido",
