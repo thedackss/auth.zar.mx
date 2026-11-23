@@ -7,7 +7,9 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
 ## Architecture decisions (settled — don't re-litigate)
 
 - **Hybrid auth**: clients authenticate with Redis-backed sessions (httpOnly
-  cookies); `POST /app/token` (app-key + session) exchanges a session for a
+  cookies; `CsrfOriginGuard` rejects cookie-bearing unsafe requests whose
+  `Origin` is not the panel, a `CORS_ORIGINS` entry or a registered app, since
+  `SameSite=Strict` does not separate `*.zar.mx` hosts from each other); `POST /app/token` (app-key + session) exchanges a session for a
   short-lived HS256 JWT that internal services verify offline with
   `AUTH_SECRET`. Tokens are app-scoped: `aud` is the issuing app's id and
   each app must reject other audiences.
@@ -17,7 +19,9 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
   `AppAccess` grant (existing user, or a pre-authorized email that converts
   to a user grant when that email signs up through the app —
   `POST /app/sign-up`). One central account works across all zar apps; each
-  app keeps its own per-user data keyed by the JWT `sub`.
+  app keeps its own per-user data keyed by the JWT `sub`. Private apps also
+  require a verified email before `POST /app/token` succeeds, because grants
+  are keyed by email.
 - **Roles are central, permissions are per-service**: only `USER`/`ADMIN` roles
   live here. Each downstream service maps roles to its own permissions. This
   service's own auth-scoped permissions (e.g. `auth.signin`, `auth.signup`)
@@ -30,9 +34,10 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
 - **Audit trail**: `AuthEvent` records auth events with no FK to users
   (rows must survive user changes; failed sign-ins may not resolve to a user).
 - **Admin bootstrap**: on startup, creates the admin from env and queues a
-  set-password invite. Deliberately does NOT auto-resend if the password was
-  never set (a crash-looping server would spam and blacklist the sender);
-  recovery is via the password-recover flow.
+  set-password invite. If the password is still unset on later startups it
+  re-sends the invite at most once per 24h (Redis SET NX cooldown), so a
+  crash-looping server cannot spam and blacklist the sender; an immediate
+  resend is available via the password-recover flow.
 - **Email**: Resend, queued through BullMQ. In dev, emails are logged
   (`[mail:log]`) instead of sent. Bull Board at `/bullmq` is protected
   by our own session auth (any ADMIN), not basic auth.
@@ -72,4 +77,5 @@ scratch — don't reintroduce old styles or routes.
 - Startup failures (Postgres/Redis down) go through
   `src/common/utils/startup-error.ts` for friendly messages — keep new
   connection errors consistent with that.
-- User-facing emails are in Spanish.
+- User-facing emails and errors default to English and render in Spanish
+  for users with `locale: es` (or requests carrying `X-Lang: es`).
