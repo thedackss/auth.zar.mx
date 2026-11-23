@@ -137,6 +137,7 @@ enum AuthEventType {
   APP_ACCESS_GRANTED
   APP_ACCESS_REVOKED
   APP_TOKEN_DENIED
+  APP_TOKEN_ISSUED
 
   @@map("auth_event_type")
 }

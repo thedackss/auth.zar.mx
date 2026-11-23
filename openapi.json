@@ -73,7 +73,8 @@
                                 "APP_REVOKED",
                                 "APP_ACCESS_GRANTED",
                                 "APP_ACCESS_REVOKED",
-                                "APP_TOKEN_DENIED"
+                                "APP_TOKEN_DENIED",
+                                "APP_TOKEN_ISSUED"
                             ]
                         }
                     },

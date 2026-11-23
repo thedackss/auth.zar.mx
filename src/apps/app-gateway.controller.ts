@@ -140,6 +140,17 @@ export class AppGatewayController {
         }
 
         const data = this.tokens.sign(user, app);
+
+        // Successes are recorded too: without them there is no way to tell
+        // whether a registered app is still in use.
+        await this.audit.record({
+            type: "APP_TOKEN_ISSUED",
+            userId: user.id,
+            email: user.email,
+            metadata: { appId: app.id, appName: app.name },
+            ...requestMeta(req),
+        });
+
         return { data, message: "Access token issued successfully" };
     }
 }
