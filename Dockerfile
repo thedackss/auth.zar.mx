@@ -53,6 +53,10 @@ COPY --from=build /app/src/prisma ./src/prisma
 COPY --from=panel /panel/dist ./panel/dist
 COPY package.json pnpm-lock.yaml prisma.config.ts ./
 
+# Everything above is read-only at runtime (migrate deploy only talks to the
+# database), so the server does not need root.
+USER node
+
 EXPOSE 3000
 
 # Apply pending migrations, then start the server.
