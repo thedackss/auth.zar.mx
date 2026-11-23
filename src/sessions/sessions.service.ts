@@ -38,6 +38,9 @@ export class SessionsService {
                 JSON.stringify(session),
             )
             .sadd(this.userKey(props.userId), id)
+            // The set only needs to outlive its newest session; without an
+            // expiry it would grow forever as sessions lapse by TTL.
+            .expire(this.userKey(props.userId), env.SESSION_TTL_SECONDS)
             .exec();
 
         return id;
@@ -51,11 +54,19 @@ export class SessionsService {
 
     public async touch(sessionId: string, session: SessionData): Promise<void> {
         session.lastSeenAt = Date.now();
-        await this.redis.client.setex(
-            this.sessionKey(sessionId),
-            env.SESSION_TTL_SECONDS,
-            JSON.stringify(session),
-        );
+        // XX: only refresh a session that still exists, so a touch racing a
+        // destroy cannot bring the session back.
+        await this.redis.client
+            .multi()
+            .set(
+                this.sessionKey(sessionId),
+                JSON.stringify(session),
+                "EX",
+                env.SESSION_TTL_SECONDS,
+                "XX",
+            )
+            .expire(this.userKey(session.userId), env.SESSION_TTL_SECONDS)
+            .exec();
     }
 
     public async destroy(sessionId: string): Promise<void> {
@@ -71,12 +82,8 @@ export class SessionsService {
 
     public async destroyAll(userId: string): Promise<void> {
         const ids = await this.redis.client.smembers(this.userKey(userId));
-        if (ids.length === 0) return;
         const keys = ids.map((id) => this.sessionKey(id));
-        await this.redis.client
-            .multi()
-            .del(...keys)
-            .del(this.userKey(userId))
-            .exec();
+        // Always drop the set too, even when empty or stale.
+        await this.redis.client.del(...keys, this.userKey(userId));
     }
 }
