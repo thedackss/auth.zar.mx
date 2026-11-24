@@ -14,11 +14,12 @@ function header(req: Request, name: string): string | undefined {
  * registered app's backend acts on behalf of its own visitor (proxied
  * sign-in, sign-up, token exchange), CF-Connecting-IP is that server, so
  * the backend forwards the visitor in X-Client-IP. That header is honoured
- * only on requests authenticated with a valid X-App-Key (req.zarApp is set
- * by AppKeyExtractGuard); anyone else sending it is ignored.
+ * only on requests authenticated with the key of a *confidential* app
+ * (req.zarApp, set by AppKeyExtractGuard): a key that ships in a browser
+ * bundle is public, and anyone holding it could spoof the headers.
  */
 export function clientIp(req: Request): string | undefined {
-    if (req.zarApp) {
+    if (req.zarApp?.confidential) {
         const forwarded = header(req, "x-client-ip")?.trim();
         if (forwarded && isIP(forwarded)) return forwarded;
     }
@@ -28,7 +29,7 @@ export function clientIp(req: Request): string | undefined {
 
 /** Same trust rule as clientIp(), for the visitor's User-Agent. */
 export function clientUserAgent(req: Request): string | undefined {
-    if (req.zarApp) {
+    if (req.zarApp?.confidential) {
         const forwarded = header(req, "x-client-user-agent");
         if (forwarded) return forwarded.slice(0, 512);
     }

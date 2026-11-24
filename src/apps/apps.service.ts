@@ -12,12 +12,14 @@ export interface CreateAppProps {
     name: string;
     url?: string;
     public: boolean;
+    confidential?: boolean;
 }
 
 export interface UpdateAppProps {
     name?: string;
     url?: string | null;
     public?: boolean;
+    confidential?: boolean;
 }
 
 @Injectable()
@@ -30,6 +32,7 @@ export class AppsService {
         name: true,
         url: true,
         public: true,
+        confidential: true,
         createdAt: true,
         updatedAt: true,
         revokedAt: true,
@@ -103,6 +106,7 @@ export class AppsService {
                     name: props.name.trim(),
                     url: props.url,
                     public: props.public,
+                    confidential: props.confidential ?? false,
                     keyHash: this.hashKey(key),
                 },
                 select: this.publicFields,

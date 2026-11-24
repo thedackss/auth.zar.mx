@@ -122,6 +122,7 @@ function Apps() {
                             <th>name</th>
                             <th>url</th>
                             <th>visibility</th>
+                            <th>key</th>
                             <th>grants</th>
                             <th />
                         </tr>
@@ -151,6 +152,25 @@ function Apps() {
                                             private
                                         </span>
                                     )}
+                                </td>
+                                <td>
+                                    <span
+                                        className={shared.tag}
+                                        data-tone={
+                                            app.confidential
+                                                ? "accent"
+                                                : undefined
+                                        }
+                                        title={
+                                            app.confidential
+                                                ? "server-side: forwarded visitor headers are trusted"
+                                                : "shipped to clients: forwarded visitor headers are ignored"
+                                        }
+                                    >
+                                        {app.confidential
+                                            ? "server-side"
+                                            : "in bundle"}
+                                    </span>
                                 </td>
                                 <td>{app._count?.accesses ?? 0}</td>
                                 <td>
@@ -186,6 +206,25 @@ function Apps() {
                                         >
                                             make{" "}
                                             {app.public ? "private" : "public"}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={shared.action}
+                                            onClick={() =>
+                                                act(() =>
+                                                    api(`/apps/${app.id}`, {
+                                                        method: "PATCH",
+                                                        body: JSON.stringify({
+                                                            confidential:
+                                                                !app.confidential,
+                                                        }),
+                                                    }),
+                                                )
+                                            }
+                                        >
+                                            {app.confidential
+                                                ? "key in bundle"
+                                                : "key server-side"}
                                         </button>
                                         <button
                                             type="button"
@@ -234,6 +273,7 @@ function CreateApp({
     const [name, setName] = useState("");
     const [url, setUrl] = useState("");
     const [isPublic, setIsPublic] = useState(false);
+    const [confidential, setConfidential] = useState(true);
     const [busy, setBusy] = useState(false);
 
     async function onSubmit(e: FormEvent) {
@@ -247,11 +287,13 @@ function CreateApp({
                     name,
                     url: url || undefined,
                     public: isPublic,
+                    confidential,
                 }),
             });
             setName("");
             setUrl("");
             setIsPublic(false);
+            setConfidential(true);
             onCreated(data.app.name, data.key);
         } catch (err) {
             onError(
@@ -286,6 +328,14 @@ function CreateApp({
                     onChange={(e) => setIsPublic(e.target.checked)}
                 />{" "}
                 public
+            </label>
+            <label title="The key stays on a server. Required to trust the visitor headers the app forwards.">
+                <input
+                    type="checkbox"
+                    checked={confidential}
+                    onChange={(e) => setConfidential(e.target.checked)}
+                />{" "}
+                server-side key
             </label>
             <button className={shared.action} type="submit" disabled={busy}>
                 {busy ? "creating..." : "create app"}

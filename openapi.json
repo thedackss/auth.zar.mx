@@ -1064,6 +1064,11 @@
                         "type": "boolean",
                         "description": "Public apps accept any zar user; private apps require access grants.",
                         "example": false
+                    },
+                    "confidential": {
+                        "type": "boolean",
+                        "description": "Server-side app whose key never reaches a browser. Only confidential\napps may forward their visitor's X-Client-IP / X-Client-User-Agent.",
+                        "example": true
                     }
                 },
                 "required": ["name", "public"]
@@ -1087,6 +1092,11 @@
                         "type": "boolean",
                         "description": "Public apps accept any zar user; private apps require access grants.",
                         "example": false
+                    },
+                    "confidential": {
+                        "type": "boolean",
+                        "description": "Server-side app whose key never reaches a browser. Only confidential\napps may forward their visitor's X-Client-IP / X-Client-User-Agent.",
+                        "example": true
                     }
                 }
             },

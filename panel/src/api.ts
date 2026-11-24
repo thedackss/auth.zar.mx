@@ -16,6 +16,7 @@ export interface ZarApp {
     name: string;
     url: string | null;
     public: boolean;
+    confidential: boolean;
     createdAt: string;
     updatedAt: string;
     revokedAt: string | null;

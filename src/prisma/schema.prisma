@@ -62,7 +62,11 @@ model App {
   url  String?
 
   public  Boolean @default(false)
-  keyHash String  @unique @map("key_hash")
+  // Server-side app whose key never reaches a browser. Only confidential
+  // apps may forward their visitor's identity (X-Client-IP / -User-Agent);
+  // a key shipped in a bundle (browser or native client) proves nothing.
+  confidential Boolean @default(false)
+  keyHash      String  @unique @map("key_hash")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

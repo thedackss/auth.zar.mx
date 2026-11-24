@@ -30,4 +30,13 @@ export class CreateAppDto {
      */
     @IsBoolean()
     public: boolean;
+
+    /**
+     * Server-side app whose key never reaches a browser. Only confidential
+     * apps may forward their visitor's X-Client-IP / X-Client-User-Agent.
+     * @example true
+     */
+    @IsOptional()
+    @IsBoolean()
+    confidential?: boolean;
 }

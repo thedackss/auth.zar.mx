@@ -5,7 +5,8 @@ import { clientIp, clientUserAgent } from "./client-ip";
 const req = (headers: Record<string, string>, zarApp?: App) =>
     ({ headers, ip: "10.0.1.5", zarApp }) as unknown as Request;
 
-const app = { id: "a1" } as App;
+const app = { id: "a1", confidential: true } as App;
+const publicClient = { id: "a2", confidential: false } as App;
 
 describe("clientIp", () => {
     it("falls back to req.ip without proxy headers", () => {
@@ -25,6 +26,20 @@ describe("clientIp", () => {
         };
         expect(clientIp(req(headers))).toBe("203.0.113.9");
         expect(clientIp(req(headers, app))).toBe("198.51.100.7");
+    });
+
+    it("ignores X-Client-IP from non-confidential apps (key in a bundle)", () => {
+        expect(
+            clientIp(
+                req(
+                    {
+                        "cf-connecting-ip": "203.0.113.9",
+                        "x-client-ip": "198.51.100.7",
+                    },
+                    publicClient,
+                ),
+            ),
+        ).toBe("203.0.113.9");
     });
 
     it("rejects a malformed forwarded ip", () => {

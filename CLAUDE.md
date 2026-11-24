@@ -28,7 +28,9 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
   a valid `X-App-Key` (resolved globally by `AppKeyExtractGuard`), the
   backend MUST forward the visitor in `X-Client-IP` and `X-Client-User-Agent`;
   `common/client-ip.ts` uses them for rate limiting and audit rows instead of
-  the backend's own address. Without a valid key those headers are ignored.
+  the backend's own address. Only apps flagged `confidential` (server-side
+  key) are trusted for this; a key that ships in a browser/native bundle
+  (nomi dashboard today) is public, so its forwarded headers are ignored.
 - **Roles are central, permissions are per-service**: only `USER`/`ADMIN` roles
   live here. Each downstream service maps roles to its own permissions. This
   service's own auth-scoped permissions (e.g. `auth.signin`, `auth.signup`)
