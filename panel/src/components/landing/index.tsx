@@ -1,9 +1,18 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useAuth } from "@/context/auth";
+import { useReturnTo } from "@/hooks/return-to";
 import styles from "./index.module.scss";
 
 export default function Landing() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
+    const { redirect } = useSearch({ from: "/" });
+    const returnTo = useReturnTo(redirect);
+
+    // An app sent an already signed-in user here: bounce them straight back.
+    useEffect(() => {
+        if (redirect && !loading && user) void returnTo();
+    }, [redirect, loading, user, returnTo]);
 
     return (
         <main className={styles.landing}>
@@ -12,7 +21,11 @@ export default function Landing() {
                     dashboard
                 </Link>
             ) : (
-                <Link className={styles.login} to="/sign-in">
+                <Link
+                    className={styles.login}
+                    to="/sign-in"
+                    search={redirect ? { redirect } : {}}
+                >
                     sign in
                 </Link>
             )}

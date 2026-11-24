@@ -1,21 +1,33 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { type FormEvent, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { type FormEvent, useEffect, useState } from "react";
 import { ApiError, api } from "@/api";
 import AuthView from "@/components/auth-view";
 import form from "@/components/auth-view/form.module.scss";
 import { useAuth } from "@/context/auth";
+import {
+    redirectHost,
+    useReturnTo,
+    validateReturnSearch,
+} from "@/hooks/return-to";
 
 export const Route = createFileRoute("/sign-in")({
+    validateSearch: validateReturnSearch,
     component: SignIn,
 });
 
 function SignIn() {
-    const navigate = useNavigate();
-    const { refresh } = useAuth();
+    const { redirect } = Route.useSearch();
+    const returnTo = useReturnTo(redirect);
+    const { user, loading, refresh } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
+
+    // Already signed in (e.g. an app sent the user here): go straight back.
+    useEffect(() => {
+        if (!loading && user) void returnTo();
+    }, [loading, user, returnTo]);
 
     async function onSubmit(e: FormEvent) {
         e.preventDefault();
@@ -28,7 +40,7 @@ function SignIn() {
                 body: JSON.stringify({ email, password }),
             });
             await refresh();
-            navigate({ to: "/dashboard", replace: true });
+            await returnTo();
         } catch (err) {
             setError(
                 err instanceof ApiError ? err.message : "Something went wrong",
@@ -39,6 +51,13 @@ function SignIn() {
 
     return (
         <AuthView title="sign in">
+            {redirectHost(redirect) && (
+                <p className={form.note}>
+                    you will be sent back to{" "}
+                    <strong>{redirectHost(redirect)}</strong>
+                </p>
+            )}
+
             <form className={form.form} onSubmit={onSubmit}>
                 <div className={form.field}>
                     <label htmlFor="email">email</label>
