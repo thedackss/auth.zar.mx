@@ -18,6 +18,10 @@ import { requestMeta } from "@/audit/request-meta";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { env } from "@/env";
 import type { User } from "@/prisma/generated/client";
+import {
+    clearSessionCookie,
+    setSessionCookie,
+} from "@/sessions/session-cookie";
 import { SessionsService } from "@/sessions/sessions.service";
 import { AuthService } from "./auth.service";
 import { Authenticated } from "./decorators/authenticated.decorator";
@@ -40,15 +44,6 @@ export class AuthController {
         private readonly setPasswordService: SetPasswordService,
         private readonly audit: AuditService,
     ) {}
-
-    private setSessionCookie(res: Response, sessionId: string) {
-        res.cookie(env.SESSION_COOKIE_NAME, sessionId, {
-            httpOnly: true,
-            secure: env.NODE_ENV === "production",
-            sameSite: env.NODE_ENV === "production" ? "strict" : "lax",
-            maxAge: env.SESSION_TTL_SECONDS * 1000,
-        });
-    }
 
     /** Short, non-sensitive description of a failed attempt for the audit log. */
     private reason(error: unknown): string {
@@ -89,7 +84,7 @@ export class AuthController {
         });
 
         const sessionId = await this.sessions.create({ userId: user.id });
-        this.setSessionCookie(res, sessionId);
+        setSessionCookie(res, sessionId);
 
         await this.audit.record({
             type: "SIGN_UP",
@@ -125,7 +120,7 @@ export class AuthController {
         }
 
         const sessionId = await this.sessions.create({ userId: user.id });
-        this.setSessionCookie(res, sessionId);
+        setSessionCookie(res, sessionId);
 
         await this.audit.record({
             type: "SIGN_IN_SUCCESS",
@@ -148,7 +143,7 @@ export class AuthController {
     ) {
         const sessionId = req.cookies?.[env.SESSION_COOKIE_NAME];
         if (sessionId) await this.sessions.destroy(sessionId);
-        res.clearCookie(env.SESSION_COOKIE_NAME);
+        clearSessionCookie(res);
 
         if (req.user) {
             await this.audit.record({
@@ -171,7 +166,7 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response,
     ) {
         await this.sessions.destroyAll(user.id);
-        res.clearCookie(env.SESSION_COOKIE_NAME);
+        clearSessionCookie(res);
 
         await this.audit.record({
             type: "SIGN_OUT_ALL",
@@ -311,7 +306,7 @@ export class AuthController {
 
         await this.sessions.destroyAll(user.id);
         const sessionId = await this.sessions.create({ userId: user.id });
-        this.setSessionCookie(res, sessionId);
+        setSessionCookie(res, sessionId);
 
         return {
             data: null,
