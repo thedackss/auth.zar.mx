@@ -122,38 +122,19 @@ function Messages() {
                                                 {m.appName}
                                             </span>
                                         </td>
-                                        <td
-                                            style={{
-                                                maxWidth: "24rem",
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                            }}
-                                        >
+                                        <td className={shared.preview}>
                                             {m.message}
                                         </td>
                                         <td>
-                                            <div className={shared.actions}>
-                                                <button
-                                                    type="button"
-                                                    className={shared.action}
-                                                    onClick={() => toggle(m)}
-                                                >
-                                                    {open === m.id
-                                                        ? "close"
-                                                        : "open"}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className={shared.action}
-                                                    onClick={() =>
-                                                        setRead(m, !m.readAt)
-                                                    }
-                                                >
-                                                    {m.readAt
-                                                        ? "mark unread"
-                                                        : "mark read"}
-                                                </button>
-                                            </div>
+                                            <button
+                                                type="button"
+                                                className={shared.action}
+                                                onClick={() => toggle(m)}
+                                            >
+                                                {open === m.id
+                                                    ? "close"
+                                                    : "open"}
+                                            </button>
                                         </td>
                                     </tr>
                                     {open === m.id && (
@@ -162,17 +143,39 @@ function Messages() {
                                                 <p className={shared.message}>
                                                     {m.message}
                                                 </p>
-                                                <p className={shared.muted}>
-                                                    reply:{" "}
+                                                <div className={shared.actions}>
                                                     <a
+                                                        className={
+                                                            shared.action
+                                                        }
                                                         href={`mailto:${m.email}`}
                                                     >
-                                                        {m.email}
+                                                        reply
                                                     </a>
-                                                    {m.ip && ` · ip ${m.ip}`}
-                                                    {m.locale &&
-                                                        ` · ${m.locale}`}
-                                                </p>
+                                                    <button
+                                                        type="button"
+                                                        className={
+                                                            shared.action
+                                                        }
+                                                        onClick={() =>
+                                                            setRead(
+                                                                m,
+                                                                !m.readAt,
+                                                            )
+                                                        }
+                                                    >
+                                                        {m.readAt
+                                                            ? "mark unread"
+                                                            : "mark read"}
+                                                    </button>
+                                                    <span
+                                                        className={shared.muted}
+                                                    >
+                                                        {m.ip && `ip ${m.ip}`}
+                                                        {m.locale &&
+                                                            ` · ${m.locale}`}
+                                                    </span>
+                                                </div>
                                             </td>
                                         </tr>
                                     )}

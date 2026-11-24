@@ -171,6 +171,16 @@
         color-mix(in oklch, var(--color-accent) 40%, transparent);
 }
 
+.preview {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.actions {
+    align-items: center;
+}
+
 .unread td:first-child {
     border-left: 2px solid var(--color-accent);
 }
