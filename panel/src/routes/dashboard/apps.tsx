@@ -418,6 +418,8 @@ function AccessPanel({
 
     return (
         <section className={shared.subsection}>
+            <RedirectUris app={app} onChanged={onChanged} onError={onError} />
+
             <h2>
                 access — {app.name}
                 {app.public && (
@@ -499,5 +501,70 @@ function AccessPanel({
                 </div>
             )}
         </section>
+    );
+}
+
+/** OAuth (PKCE) callback URIs, one per line; exact match on the server. */
+function RedirectUris({
+    app,
+    onChanged,
+    onError,
+}: {
+    app: ZarApp;
+    onChanged: () => Promise<void>;
+    onError: (message: string) => void;
+}) {
+    const [text, setText] = useState(app.redirectUris.join("\n"));
+    const [busy, setBusy] = useState(false);
+    const dirty = text.trim() !== app.redirectUris.join("\n");
+
+    async function save(e: FormEvent) {
+        e.preventDefault();
+        setBusy(true);
+        try {
+            await api(`/apps/${app.id}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    redirectUris: text
+                        .split("\n")
+                        .map((l) => l.trim())
+                        .filter(Boolean),
+                }),
+            });
+            await onChanged();
+        } catch (err) {
+            onError(
+                err instanceof ApiError
+                    ? err.message
+                    : "Failed to save redirect URIs",
+            );
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    return (
+        <form className={shared.inlineForm} onSubmit={save}>
+            <label htmlFor={`redirect-${app.id}`}>
+                oauth redirect uris (one per line; https or custom scheme)
+            </label>
+            <textarea
+                id={`redirect-${app.id}`}
+                className={shared.textarea}
+                rows={3}
+                placeholder={
+                    "https://app.domain.tld/auth/callback\nxp24://auth/callback"
+                }
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+            />
+            <button
+                className={shared.action}
+                type="submit"
+                disabled={busy || !dirty}
+            >
+                {busy ? "saving..." : "save redirect uris"}
+            </button>
+        </form>
     );
 }

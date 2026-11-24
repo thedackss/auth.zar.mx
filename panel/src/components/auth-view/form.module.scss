@@ -82,6 +82,30 @@
     }
 }
 
+.secondary {
+    padding: calc(0.25rem * 3) calc(0.25rem * 4);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+
+    background: none;
+    border: 1px solid color-mix(in oklch, var(--color-text) 12%, transparent);
+    border-radius: 2px;
+    cursor: pointer;
+
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+        color: var(--color-text);
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+}
+
 .error {
     font-size: 0.8rem;
     line-height: 1.5;

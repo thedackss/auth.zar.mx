@@ -35,6 +35,12 @@ export function useReturnTo(redirect: string | undefined) {
     const navigate = useNavigate();
 
     return useCallback(async () => {
+        // Panel-internal target (e.g. /authorize?...): same origin, no check.
+        if (redirect && /^\/(?!\/)/.test(redirect)) {
+            navigate({ href: redirect, replace: true });
+            return;
+        }
+
         if (redirect) {
             const { allowed } = await api<{ allowed: boolean }>(
                 `/app/redirect-check?url=${encodeURIComponent(redirect)}`,

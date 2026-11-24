@@ -146,6 +146,25 @@
     }
 }
 
+.textarea {
+    width: 100%;
+    padding: calc(0.25rem * 1.5) calc(0.25rem * 3);
+
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--color-text);
+
+    background: transparent;
+    border: 1px solid color-mix(in oklch, var(--color-text) 12%, transparent);
+    border-radius: 2px;
+    resize: vertical;
+
+    &:focus {
+        outline: none;
+        border-color: color-mix(in oklch, var(--color-accent) 50%, transparent);
+    }
+}
+
 .subsection {
     display: flex;
     flex-direction: column;

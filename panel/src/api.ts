@@ -17,6 +17,7 @@ export interface ZarApp {
     url: string | null;
     public: boolean;
     confidential: boolean;
+    redirectUris: string[];
     createdAt: string;
     updatedAt: string;
     revokedAt: string | null;
@@ -43,6 +44,22 @@ export interface AuthEvent {
     userAgent: string | null;
     metadata: Record<string, unknown> | null;
     createdAt: string;
+}
+
+export interface AppSession {
+    familyId: string;
+    app: { id: string; name: string; url: string | null };
+    deviceName: string | null;
+    createdAt: string;
+    lastUsedAt: string | null;
+    expiresAt: string;
+}
+
+export interface OauthClient {
+    id: string;
+    name: string;
+    url: string | null;
+    public: boolean;
 }
 
 export interface ContactMessage {

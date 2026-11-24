@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthorizeRouteImport } from './routes/authorize'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as RecoverPasswordRouteImport } from './routes/recover-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
@@ -26,6 +27,11 @@ import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthorizeRoute = AuthorizeRouteImport.update({
+  id: '/authorize',
+  path: '/authorize',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
@@ -92,6 +98,7 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/authorize': typeof AuthorizeRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/sign-in': typeof SignInRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/authorize': typeof AuthorizeRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/sign-in': typeof SignInRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/authorize': typeof AuthorizeRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/sign-in': typeof SignInRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/authorize'
     | '/recover-password'
     | '/sign-in'
     | '/auth/set-password'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/authorize'
     | '/recover-password'
     | '/sign-in'
     | '/auth/set-password'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/authorize'
     | '/recover-password'
     | '/sign-in'
     | '/auth/set-password'
@@ -184,6 +196,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  AuthorizeRoute: typeof AuthorizeRoute
   RecoverPasswordRoute: typeof RecoverPasswordRoute
   SignInRoute: typeof SignInRoute
   AuthSetPasswordRoute: typeof AuthSetPasswordRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authorize': {
+      id: '/authorize'
+      path: '/authorize'
+      fullPath: '/authorize'
+      preLoaderRoute: typeof AuthorizeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -313,6 +333,7 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  AuthorizeRoute: AuthorizeRoute,
   RecoverPasswordRoute: RecoverPasswordRoute,
   SignInRoute: SignInRoute,
   AuthSetPasswordRoute: AuthSetPasswordRoute,
