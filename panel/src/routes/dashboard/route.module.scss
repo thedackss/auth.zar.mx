@@ -97,7 +97,7 @@
     gap: calc(0.25rem * 5);
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
     .dashboard {
         padding: calc(0.25rem * 4);
 
