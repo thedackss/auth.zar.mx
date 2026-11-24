@@ -22,6 +22,13 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
   app keeps its own per-user data keyed by the JWT `sub`. Private apps also
   require a verified email before `POST /app/token` succeeds, because grants
   are keyed by email.
+- **App backends proxy for their visitors**: the session cookie is host-only,
+  so an app's server calls `/sign-in`, `/app/sign-up` (which also returns a
+  session) and `/app/token` on the visitor's behalf. On any request carrying
+  a valid `X-App-Key` (resolved globally by `AppKeyExtractGuard`), the
+  backend MUST forward the visitor in `X-Client-IP` and `X-Client-User-Agent`;
+  `common/client-ip.ts` uses them for rate limiting and audit rows instead of
+  the backend's own address. Without a valid key those headers are ignored.
 - **Roles are central, permissions are per-service**: only `USER`/`ADMIN` roles
   live here. Each downstream service maps roles to its own permissions. This
   service's own auth-scoped permissions (e.g. `auth.signin`, `auth.signup`)

@@ -8,6 +8,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
 import { LoggerModule } from "nestjs-pino";
 import { AppController } from "@/app.controller";
 import { AppService } from "@/app.service";
+import { AppKeyExtractGuard } from "@/apps/app-key-extract.guard";
 import { AppsModule } from "@/apps/apps.module";
 import { AuditModule } from "@/audit/audit.module";
 import { AuthModule } from "@/auth/auth.module";
@@ -74,6 +75,9 @@ const panelModule = existsSync(panelDist)
     controllers: [AppController, HealthController],
     providers: [
         AppService,
+        // Order matters: the app key must be resolved before the throttler
+        // and the CSRF guard look at the request.
+        { provide: APP_GUARD, useClass: AppKeyExtractGuard },
         { provide: APP_GUARD, useClass: ClientIpThrottlerGuard },
         { provide: APP_GUARD, useClass: CsrfOriginGuard },
         { provide: APP_GUARD, useClass: SessionExtractGuard },
