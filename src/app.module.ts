@@ -20,6 +20,7 @@ import { CredentialsModule } from "@/credentials/credentials.module";
 import { EmailModule } from "@/email/email.module";
 import { env } from "@/env";
 import { HealthController } from "@/health/health.controller";
+import { OauthModule } from "@/oauth/oauth.module";
 import { PrismaModule } from "@/prisma/prisma.module";
 import { RedisModule } from "@/redis/redis.module";
 import { SessionExtractGuard } from "@/sessions/session-extract.guard";
@@ -73,6 +74,7 @@ const panelModule = existsSync(panelDist)
         SettingsModule,
         EmailModule,
         ContactModule,
+        OauthModule,
     ],
     controllers: [AppController, HealthController],
     providers: [

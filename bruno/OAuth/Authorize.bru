@@ -1,0 +1,30 @@
+meta {
+  name: Authorize
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/app/authorize
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "client_id": "{{appId}}",
+    "redirect_uri": "xp24://auth/callback",
+    "code_challenge": "{{codeChallenge}}",
+    "code_challenge_method": "S256",
+    "state": "random-state"
+  }
+}
+
+docs {
+  Needs the panel session cookie. code_challenge = BASE64URL(SHA256(code_verifier)).
+  The response carries redirectTo with ?code=...&state=...; redeem the code with Token.
+}

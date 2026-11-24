@@ -1,0 +1,31 @@
+meta {
+  name: Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/app/oauth/token
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "grant_type": "authorization_code",
+    "client_id": "{{appId}}",
+    "code": "{{authCode}}",
+    "code_verifier": "{{codeVerifier}}",
+    "redirect_uri": "xp24://auth/callback",
+    "device_name": "bruno"
+  }
+}
+
+docs {
+  For a refresh: { "grant_type": "refresh_token", "client_id": "{{appId}}", "refresh_token": "{{refreshToken}}" }.
+  Refresh tokens rotate on every use; presenting an old one revokes the whole family.
+}

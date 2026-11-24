@@ -36,6 +36,7 @@ model User {
 
   authCredentials AuthCredential[]
   appAccesses     AppAccess[]
+  appRefreshTokens AppRefreshToken[]
 
   @@map("users")
 }
@@ -68,14 +69,48 @@ model App {
   confidential Boolean @default(false)
   keyHash      String  @unique @map("key_hash")
 
+  // OAuth (authorization code + PKCE) callback URIs, exact-match only.
+  // https URLs or custom schemes (e.g. xp24://auth/callback).
+  redirectUris String[] @default([]) @map("redirect_uris")
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   revokedAt DateTime? @map("revoked_at")
 
   accesses        AppAccess[]
   contactMessages ContactMessage[]
+  refreshTokens   AppRefreshToken[]
 
   @@map("apps")
+}
+
+// Refresh token issued to a public client (native/cross-site app) through
+// the PKCE flow. Opaque value, stored hashed, rotated on every use: the old
+// row stays with revokedAt set so a replay is detected and revokes the
+// whole family (one family = one device sign-in).
+model AppRefreshToken {
+  id       String @id @default(uuid(7))
+  appId    String @map("app_id")
+  userId   String @map("user_id")
+  familyId String @map("family_id")
+
+  tokenHash  String  @unique @map("token_hash")
+  deviceName String? @map("device_name")
+
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastUsedAt DateTime? @map("last_used_at")
+  expiresAt  DateTime  @map("expires_at")
+  // Set by rotation: a superseded token presented again means a replay.
+  supersededAt DateTime? @map("superseded_at")
+  // Set by explicit revocation (user, app, admin cascade): plain rejection.
+  revokedAt DateTime? @map("revoked_at")
+
+  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, appId])
+  @@index([familyId])
+  @@map("app_refresh_tokens")
 }
 
 // A contact-form submission relayed by an app (POST /contact with its key).
@@ -171,6 +206,12 @@ enum AuthEventType {
   APP_ACCESS_REVOKED
   APP_TOKEN_DENIED
   APP_TOKEN_ISSUED
+  APP_AUTHORIZE
+  APP_AUTHORIZE_DENIED
+  APP_CODE_REDEEMED
+  APP_TOKEN_REFRESHED
+  APP_REFRESH_REUSE_DETECTED
+  APP_TOKEN_REVOKED
 
   @@map("auth_event_type")
 }

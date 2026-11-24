@@ -75,7 +75,13 @@
                                 "APP_ACCESS_GRANTED",
                                 "APP_ACCESS_REVOKED",
                                 "APP_TOKEN_DENIED",
-                                "APP_TOKEN_ISSUED"
+                                "APP_TOKEN_ISSUED",
+                                "APP_AUTHORIZE",
+                                "APP_AUTHORIZE_DENIED",
+                                "APP_CODE_REDEEMED",
+                                "APP_TOKEN_REFRESHED",
+                                "APP_REFRESH_REUSE_DETECTED",
+                                "APP_TOKEN_REVOKED"
                             ]
                         }
                     },
@@ -934,6 +940,191 @@
                 ],
                 "tags": ["contact"]
             }
+        },
+        "/api/app/authorize-check": {
+            "get": {
+                "operationId": "OauthController_authorizeCheck",
+                "parameters": [
+                    {
+                        "name": "client_id",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "maxLength": 64,
+                            "example": "01900000-0000-7000-8000-000000000001",
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "required": true,
+                        "in": "query",
+                        "description": "Must exactly match one of the app's registered redirect URIs.",
+                        "schema": {
+                            "maxLength": 512,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "summary": "Is this client_id + redirect_uri pair valid? Public info for the consent screen.",
+                "tags": ["oauth"]
+            }
+        },
+        "/api/app/authorize": {
+            "post": {
+                "operationId": "OauthController_authorize",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthorizeDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookie": []
+                    }
+                ],
+                "tags": ["oauth"]
+            }
+        },
+        "/api/app/authorize/deny": {
+            "post": {
+                "operationId": "OauthController_deny",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthorizeDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "security": [
+                    {
+                        "cookie": []
+                    }
+                ],
+                "summary": "The user declined on the consent screen.",
+                "tags": ["oauth"]
+            }
+        },
+        "/api/app/oauth/token": {
+            "post": {
+                "operationId": "OauthController_token",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["oauth"]
+            }
+        },
+        "/api/app/oauth/revoke": {
+            "post": {
+                "operationId": "OauthController_revoke",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RevokeDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["oauth"]
+            }
+        },
+        "/api/app/oauth/sessions": {
+            "get": {
+                "operationId": "OauthController_sessions",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "security": [
+                    {
+                        "cookie": []
+                    }
+                ],
+                "summary": "Devices / apps the current user is signed into through the PKCE flow.",
+                "tags": ["oauth"]
+            }
+        },
+        "/api/app/oauth/sessions/{familyId}": {
+            "delete": {
+                "operationId": "OauthController_revokeSession",
+                "parameters": [
+                    {
+                        "name": "familyId",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "security": [
+                    {
+                        "cookie": []
+                    }
+                ],
+                "tags": ["oauth"]
+            }
         }
     },
     "info": {
@@ -1095,6 +1286,19 @@
                         "type": "boolean",
                         "description": "Server-side app whose key never reaches a browser. Only confidential\napps may forward their visitor's X-Client-IP / X-Client-User-Agent.",
                         "example": true
+                    },
+                    "redirectUris": {
+                        "description": "OAuth (PKCE) callback URIs, matched exactly. https URLs or custom\nschemes such as \"xp24://auth/callback\"; http only for localhost.",
+                        "example": [
+                            "https://app.domain.tld/auth/callback",
+                            "xp24://auth/callback"
+                        ],
+                        "maxItems": 20,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 512
+                        }
                     }
                 },
                 "required": ["name", "public"]
@@ -1123,6 +1327,19 @@
                         "type": "boolean",
                         "description": "Server-side app whose key never reaches a browser. Only confidential\napps may forward their visitor's X-Client-IP / X-Client-User-Agent.",
                         "example": true
+                    },
+                    "redirectUris": {
+                        "description": "OAuth (PKCE) callback URIs, matched exactly. https URLs or custom\nschemes such as \"xp24://auth/callback\"; http only for localhost.",
+                        "example": [
+                            "https://app.domain.tld/auth/callback",
+                            "xp24://auth/callback"
+                        ],
+                        "maxItems": 20,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 512
+                        }
                     }
                 }
             },
@@ -1177,6 +1394,97 @@
                     }
                 },
                 "required": ["name", "email", "message"]
+            },
+            "AuthorizeDto": {
+                "type": "object",
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "example": "01900000-0000-7000-8000-000000000001",
+                        "maxLength": 64
+                    },
+                    "redirect_uri": {
+                        "type": "string",
+                        "description": "Must exactly match one of the app's registered redirect URIs.",
+                        "maxLength": 512
+                    },
+                    "code_challenge": {
+                        "type": "string",
+                        "description": "BASE64URL(SHA256(code_verifier)), 43 chars.",
+                        "pattern": "^[A-Za-z0-9_-]{43}$"
+                    },
+                    "code_challenge_method": {
+                        "type": "string",
+                        "description": "Only S256 is accepted.",
+                        "enum": ["S256"]
+                    },
+                    "state": {
+                        "type": "string",
+                        "description": "Opaque value echoed back to the app on redirect.",
+                        "maxLength": 512
+                    }
+                },
+                "required": [
+                    "client_id",
+                    "redirect_uri",
+                    "code_challenge",
+                    "code_challenge_method"
+                ]
+            },
+            "TokenDto": {
+                "type": "object",
+                "properties": {
+                    "grant_type": {
+                        "type": "string",
+                        "example": "authorization_code",
+                        "enum": ["authorization_code", "refresh_token"]
+                    },
+                    "client_id": {
+                        "type": "string",
+                        "description": "The app id.",
+                        "maxLength": 64
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "authorization_code: the code received on the redirect.",
+                        "maxLength": 128
+                    },
+                    "code_verifier": {
+                        "type": "string",
+                        "description": "authorization_code: the PKCE verifier the challenge was built from.",
+                        "pattern": "^[A-Za-z0-9._~-]{43,128}$"
+                    },
+                    "redirect_uri": {
+                        "type": "string",
+                        "description": "authorization_code: must equal the redirect_uri used to get the code.",
+                        "maxLength": 512
+                    },
+                    "device_name": {
+                        "type": "string",
+                        "description": "authorization_code: optional label shown in the user's device list.",
+                        "maxLength": 100
+                    },
+                    "refresh_token": {
+                        "type": "string",
+                        "description": "refresh_token: the current refresh token (rotated on every use).",
+                        "maxLength": 128
+                    }
+                },
+                "required": ["grant_type", "client_id"]
+            },
+            "RevokeDto": {
+                "type": "object",
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "refresh_token": {
+                        "type": "string",
+                        "maxLength": 128
+                    }
+                },
+                "required": ["client_id", "refresh_token"]
             }
         }
     }

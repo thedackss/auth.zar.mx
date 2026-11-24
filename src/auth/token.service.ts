@@ -22,7 +22,7 @@ export interface AccessTokenPayload {
  */
 @Injectable()
 export class TokenService {
-    public sign(user: User, app: App) {
+    public sign(user: User, app: App, expiresIn = env.JWT_TTL_SECONDS) {
         const accessToken = jwt.sign(
             { email: user.email, role: user.role, app: app.name },
             env.AUTH_SECRET,
@@ -30,7 +30,7 @@ export class TokenService {
                 algorithm: "HS256",
                 subject: user.id,
                 audience: app.id,
-                expiresIn: env.JWT_TTL_SECONDS,
+                expiresIn,
                 issuer: "zar-auth",
             },
         );
@@ -38,7 +38,7 @@ export class TokenService {
         return {
             accessToken,
             tokenType: "Bearer" as const,
-            expiresIn: env.JWT_TTL_SECONDS,
+            expiresIn,
         };
     }
 

@@ -58,6 +58,22 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
   consumer apps set that header per page language; the panel never sends it,
   so the admin UI stays English.
 
+- **OAuth authorization code + PKCE** (`src/oauth/`, GitHub issue #2): for
+  public clients (native apps, web apps on other domains) that cannot send
+  the first-party session cookie or keep a secret. `App.redirectUris` (exact
+  match, https or custom scheme). Panel `/authorize` validates via
+  `GET /app/authorize-check`, then `POST /app/authorize` (session) issues a
+  60s single-use code in Redis bound to app, user, redirect URI and S256
+  challenge. `POST /app/oauth/token` redeems it (`authorization_code`) or
+  rotates a refresh token (`refresh_token`); refresh tokens are opaque,
+  hashed in `app_refresh_tokens`, one family per device, sliding 90d expiry,
+  and presenting a superseded token revokes the family
+  (`APP_REFRESH_REUSE_DETECTED`). Access tokens from this flow live
+  `OAUTH_ACCESS_TTL_SECONDS` (15 min) instead of 60s. Disabling a user,
+  revoking an app or removing a grant revokes the matching refresh tokens
+  (`RefreshTokensModule`, imported by Apps/Users to avoid a cycle). Users see
+  and revoke their app sign-ins on the account page (`/app/oauth/sessions`).
+  No `X-App-Key` on these endpoints: PKCE replaces the client secret.
 - **Contact relay** (`src/contact/`): `POST /contact` with an app key stores a
   contact-form submission (`contact_messages`) and queues an email to
   `CONTACT_TO` (fallback `ADMIN_EMAIL`) with reply-to the sender. Throttled

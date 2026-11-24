@@ -30,6 +30,14 @@ const EnvSchema = z.object({
     AUTH_SECRET: z.string().min(32),
     // Lifetime of the short-lived JWTs minted by POST /auth/token.
     JWT_TTL_SECONDS: z.coerce.number().int().positive().default(60),
+    // Access tokens issued through the PKCE flow (native/cross-site apps
+    // refresh instead of re-exchanging a session), and their refresh tokens.
+    OAUTH_ACCESS_TTL_SECONDS: z.coerce.number().int().positive().default(900),
+    OAUTH_REFRESH_TTL_SECONDS: z.coerce
+        .number()
+        .int()
+        .positive()
+        .default(60 * 60 * 24 * 90),
     SESSION_TTL_SECONDS: z.coerce
         .number()
         .int()

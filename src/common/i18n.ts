@@ -34,6 +34,15 @@ const ES: Record<string, string> = {
     "Verify your email address before accessing this app":
         "Verifica tu correo electrónico antes de acceder a esta app",
 
+    // oauth (pkce)
+    "Unknown client": "Cliente desconocido",
+    "Redirect URI is not registered for this app":
+        "La URI de redirección no está registrada para esta app",
+    "Invalid or expired authorization code":
+        "El código de autorización no es válido o ha caducado",
+    "Invalid refresh token": "El token de actualización no es válido",
+    "Refresh token has expired": "El token de actualización ha caducado",
+
     // validation (custom messages on DTOs)
     "Email address is not valid": "El correo electrónico no es válido",
     "Password must include upper and lower case letters, a number, and a symbol (8+ characters)":

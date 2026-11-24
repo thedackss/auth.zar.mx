@@ -1,0 +1,22 @@
+meta {
+  name: Revoke
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/app/oauth/revoke
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "client_id": "{{appId}}",
+    "refresh_token": "{{refreshToken}}"
+  }
+}

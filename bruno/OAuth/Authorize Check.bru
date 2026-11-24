@@ -1,0 +1,16 @@
+meta {
+  name: Authorize Check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/app/authorize-check?client_id={{appId}}&redirect_uri=xp24://auth/callback
+  body: none
+  auth: none
+}
+
+params:query {
+  client_id: {{appId}}
+  redirect_uri: xp24://auth/callback
+}
