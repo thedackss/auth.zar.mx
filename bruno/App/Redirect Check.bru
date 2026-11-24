@@ -1,0 +1,15 @@
+meta {
+  name: Redirect Check
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/app/redirect-check?url=https://app.domain.tld/callback
+  body: none
+  auth: none
+}
+
+params:query {
+  url: https://app.domain.tld/callback
+}

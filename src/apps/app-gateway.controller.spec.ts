@@ -132,3 +132,30 @@ describe("AppGatewayController.signUp", () => {
         );
     });
 });
+
+describe("AppGatewayController.redirectCheck", () => {
+    const apps = {
+        isAllowedOrigin: jest.fn(async (o: string) => o === "https://app.test"),
+    };
+    const controller = new AppGatewayController(
+        apps as never,
+        {} as never,
+        {} as never,
+        {} as never,
+        {} as never,
+        {} as never,
+        {} as never,
+        {} as never,
+    );
+
+    it("allows only registered app origins, by origin not full url", async () => {
+        await expect(
+            controller.redirectCheck({ url: "https://app.test/admin?x=1" }),
+        ).resolves.toMatchObject({ data: { allowed: true } });
+        expect(apps.isAllowedOrigin).toHaveBeenCalledWith("https://app.test");
+
+        await expect(
+            controller.redirectCheck({ url: "https://evil.test/app.test" }),
+        ).resolves.toMatchObject({ data: { allowed: false } });
+    });
+});

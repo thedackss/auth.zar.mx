@@ -2,10 +2,12 @@ import {
     Body,
     Controller,
     ForbiddenException,
+    Get,
     HttpCode,
     HttpException,
     HttpStatus,
     Post,
+    Query,
     Req,
     Res,
 } from "@nestjs/common";
@@ -30,6 +32,7 @@ import {
     AppAuthenticated,
     CurrentApp,
 } from "./decorators/app-authenticated.decorator";
+import { RedirectCheckDto } from "./dto/redirect-check.dto";
 
 /**
  * Server-to-server endpoints for registered apps (X-App-Key). Public apps
@@ -50,6 +53,31 @@ export class AppGatewayController {
         private readonly prisma: PrismaService,
         private readonly sessions: SessionsService,
     ) {}
+
+    /**
+     * May the panel send a user back to this URL after sign-in? Only origins
+     * of registered, non-revoked apps qualify, so `?redirect=` on the panel
+     * can never act as an open redirector. Same trust set as dynamic CORS.
+     */
+    @Get("redirect-check")
+    @Throttle({ default: { limit: 30, ttl: 60_000 } })
+    public async redirectCheck(@Query() query: RedirectCheckDto) {
+        let allowed = false;
+        try {
+            allowed = await this.apps.isAllowedOrigin(
+                new URL(query.url).origin,
+            );
+        } catch {
+            // Unparseable: stays false.
+        }
+
+        return {
+            data: { allowed },
+            message: allowed
+                ? "Redirect target is a registered app"
+                : "Redirect target is not a registered app",
+        };
+    }
 
     @Post("sign-up")
     @AppAuthenticated()

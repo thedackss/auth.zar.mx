@@ -699,6 +699,32 @@
                 "tags": ["apps"]
             }
         },
+        "/api/app/redirect-check": {
+            "get": {
+                "operationId": "AppGatewayController_redirectCheck",
+                "parameters": [
+                    {
+                        "name": "url",
+                        "required": true,
+                        "in": "query",
+                        "description": "Absolute URL the panel wants to send a signed-in user back to.",
+                        "schema": {
+                            "maxLength": 2048,
+                            "format": "uri",
+                            "example": "https://app.domain.tld/callback",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "summary": "May the panel send a user back to this URL after sign-in? Only origins\nof registered, non-revoked apps qualify, so `?redirect=` on the panel\ncan never act as an open redirector. Same trust set as dynamic CORS.",
+                "tags": ["app"]
+            }
+        },
         "/api/app/sign-up": {
             "post": {
                 "operationId": "AppGatewayController_signUp",
