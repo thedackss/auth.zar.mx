@@ -94,6 +94,14 @@
     color: var(--color-muted);
 }
 
+// Context line above a form (e.g. "you will be sent back to ...").
+.hint {
+    margin-bottom: calc(0.25rem * 5);
+
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
 .aside {
     margin-top: calc(0.25rem * 6);
 

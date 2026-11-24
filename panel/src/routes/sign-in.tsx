@@ -52,7 +52,7 @@ function SignIn() {
     return (
         <AuthView title="sign in">
             {redirectHost(redirect) && (
-                <p className={form.note}>
+                <p className={form.hint}>
                     you will be sent back to{" "}
                     <strong>{redirectHost(redirect)}</strong>
                 </p>
