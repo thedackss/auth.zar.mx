@@ -80,10 +80,10 @@ export class ContactService {
             replyTo: body.email,
             subject,
             text: `${meta}\n\n${body.message}`,
-            html: `
-            <p><strong>${escapeHtml(meta)}</strong></p>
-            <p style="white-space: pre-wrap">${escapeHtml(body.message)}</p>
-            `.trim(),
+            html: [
+                `<p><strong>${escapeHtml(meta)}</strong></p>`,
+                `<p style="white-space: pre-wrap">${escapeHtml(body.message)}</p>`,
+            ].join("\n"),
         });
 
         this.logger.log(`Contact message ${row.id} from ${app.name} queued`);
