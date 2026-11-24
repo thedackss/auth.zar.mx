@@ -44,6 +44,20 @@ export interface AuthEvent {
     createdAt: string;
 }
 
+export interface ContactMessage {
+    id: string;
+    appId: string | null;
+    appName: string;
+    name: string;
+    email: string;
+    message: string;
+    locale: string;
+    ip: string | null;
+    userAgent: string | null;
+    createdAt: string;
+    readAt: string | null;
+}
+
 export interface Paginated<T> {
     items: T[];
     meta: { total: number; page: number; limit: number; totalPages: number };

@@ -56,6 +56,14 @@ NestJS 11 + Prisma 7 (Postgres, `citext`) + Redis/BullMQ. Package manager: pnpm.
   consumer apps set that header per page language; the panel never sends it,
   so the admin UI stays English.
 
+- **Contact relay** (`src/contact/`): `POST /contact` with an app key stores a
+  contact-form submission (`contact_messages`) and queues an email to
+  `CONTACT_TO` (fallback `ADMIN_EMAIL`) with reply-to the sender. Throttled
+  per visitor via `X-Client-IP`; `website` is a honeypot field. Admins read
+  and mark messages in the panel's "messages" tab (`contact.read`). This is
+  the "global zar API" zar.software was waiting for; if more non-auth
+  endpoints appear, lift the module into its own service.
+
 ## Panel (`panel/`)
 
 Plain standalone Vite + React project — intentionally NOT a pnpm workspace

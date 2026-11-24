@@ -68,9 +68,37 @@ model App {
   updatedAt DateTime  @updatedAt @map("updated_at")
   revokedAt DateTime? @map("revoked_at")
 
-  accesses AppAccess[]
+  accesses        AppAccess[]
+  contactMessages ContactMessage[]
 
   @@map("apps")
+}
+
+// A contact-form submission relayed by an app (POST /contact with its key).
+// Kept after the email goes out so nothing is lost if delivery fails, and
+// so the panel can list them. appName is a snapshot: the app may be deleted.
+model ContactMessage {
+  id String @id @default(uuid(7))
+
+  appId   String? @map("app_id")
+  appName String  @map("app_name")
+
+  name    String
+  email   String @db.Citext
+  message String
+  locale  String @default("en")
+
+  ip        String?
+  userAgent String? @map("user_agent")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  readAt    DateTime? @map("read_at")
+
+  app App? @relation(fields: [appId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([appId, createdAt])
+  @@map("contact_messages")
 }
 
 // Per-user (or pre-authorized email) access to a private app. Exactly one

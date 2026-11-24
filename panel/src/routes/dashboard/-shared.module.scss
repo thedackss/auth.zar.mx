@@ -160,6 +160,21 @@
     }
 }
 
+.message {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.85rem;
+    line-height: 1.5;
+
+    padding: calc(0.25rem * 3) calc(0.25rem * 4);
+    border-left: 2px solid
+        color-mix(in oklch, var(--color-accent) 40%, transparent);
+}
+
+.unread td:first-child {
+    border-left: 2px solid var(--color-accent);
+}
+
 .pager {
     display: flex;
     align-items: center;

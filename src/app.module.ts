@@ -15,6 +15,7 @@ import { AuthModule } from "@/auth/auth.module";
 import { ClientIpThrottlerGuard } from "@/common/guards/client-ip-throttler.guard";
 import { CsrfOriginGuard } from "@/common/guards/csrf-origin.guard";
 import { loggerConfig } from "@/common/logger/logger.config";
+import { ContactModule } from "@/contact/contact.module";
 import { CredentialsModule } from "@/credentials/credentials.module";
 import { EmailModule } from "@/email/email.module";
 import { env } from "@/env";
@@ -71,6 +72,7 @@ const panelModule = existsSync(panelDist)
         SessionsModule,
         SettingsModule,
         EmailModule,
+        ContactModule,
     ],
     controllers: [AppController, HealthController],
     providers: [

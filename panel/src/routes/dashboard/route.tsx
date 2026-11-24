@@ -58,6 +58,12 @@ function DashboardLayout() {
                             >
                                 audit
                             </Link>
+                            <Link
+                                to="/dashboard/messages"
+                                activeProps={{ "data-active": true }}
+                            >
+                                messages
+                            </Link>
                             {/* Bull Board is served by the backend, outside
                                 the SPA, so a plain anchor. */}
                             <a href="/bullmq">bullmq</a>

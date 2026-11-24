@@ -1,0 +1,29 @@
+meta {
+  name: Send Message
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/contact
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-App-Key: {{appKey}}
+  X-Client-IP: 203.0.113.9
+  X-Client-User-Agent: Mozilla/5.0 (visitor)
+  X-Lang: es
+}
+
+body:json {
+  {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "message": "Hi, I need a website for my shop.",
+    "lang": "es",
+    "website": ""
+  }
+}

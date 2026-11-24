@@ -13,6 +13,7 @@ export const PERMISSIONS = [
     "apps.manage",
     "queues.read",
     "audit.read",
+    "contact.read",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];

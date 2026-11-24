@@ -19,6 +19,9 @@ const EnvSchema = z.object({
 
     // Email of the user to promote to ADMIN on startup (bootstrap).
     ADMIN_EMAIL: z.email().optional(),
+    // Inbox that receives contact-form messages (POST /contact). Falls back
+    // to ADMIN_EMAIL; with neither set the endpoint answers 503.
+    CONTACT_TO: z.email().optional(),
 
     REDIS_URL: z.url(),
     DATABASE_URL: z.url(),
