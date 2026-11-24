@@ -10,7 +10,11 @@
     max-width: 100dvw;
     max-height: 100dvh;
 
-    background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+    background: radial-gradient(
+        circle,
+        var(--color-accent) 0%,
+        transparent 70%
+    );
     border-radius: 3.40282e38px;
 
     pointer-events: none;

@@ -33,14 +33,19 @@
         color: var(--color-text);
 
         background: transparent;
-        border: 1px solid color-mix(in oklch, var(--color-text) 12%, transparent);
+        border: 1px solid
+            color-mix(in oklch, var(--color-text) 12%, transparent);
         border-radius: 2px;
 
         transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:focus {
             outline: none;
-            border-color: color-mix(in oklch, var(--color-accent) 50%, transparent);
+            border-color: color-mix(
+                in oklch,
+                var(--color-accent) 50%,
+                transparent
+            );
         }
 
         &::placeholder {
