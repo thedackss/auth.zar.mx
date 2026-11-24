@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { ApiError, type AppAccess, api, type ZarApp } from "@/api";
-import form from "@/components/auth-view/form.module.scss";
+import { useConfirm } from "@/components/dialog/confirm";
+import { KeyReveal } from "@/components/dialog/key-reveal";
 import { AdminOnly } from "./-admin";
 import shared from "./-shared.module.scss";
 
@@ -22,6 +23,7 @@ function Apps() {
         key: string;
     } | null>(null);
     const [selected, setSelected] = useState<ZarApp | null>(null);
+    const { confirm, element: confirmDialog } = useConfirm();
 
     const load = useCallback(async () => {
         try {
@@ -53,6 +55,36 @@ function Apps() {
         }
     }
 
+    async function regenerateKey(app: ZarApp) {
+        const ok = await confirm({
+            title: `issue a new key for ${app.name}?`,
+            detail: "The current key stops working immediately; the app's backend must be updated with the new one.",
+            action: "new key",
+            danger: true,
+        });
+        if (!ok) return;
+
+        await act(async () => {
+            const data = await api<{ app: ZarApp; key: string }>(
+                `/apps/${app.id}/key`,
+                { method: "POST" },
+            );
+            setFreshKey({ appName: data.app.name, key: data.key });
+        });
+    }
+
+    async function revokeApp(app: ZarApp) {
+        const ok = await confirm({
+            title: `revoke ${app.name}?`,
+            detail: "Its key stops authenticating and its origin leaves the CORS allow-list. Issuing a new key re-enables it.",
+            action: "revoke",
+            danger: true,
+        });
+        if (!ok) return;
+
+        await act(() => api(`/apps/${app.id}/revoke`, { method: "POST" }));
+    }
+
     if (!apps) {
         return error ? (
             <p className={shared.error}>{error}</p>
@@ -65,11 +97,14 @@ function Apps() {
         <>
             {error && <p className={shared.error}>{error}</p>}
 
+            {confirmDialog}
+
             {freshKey && (
-                <p className={form.note}>
-                    key for <strong>{freshKey.appName}</strong> (shown only
-                    once): <code>{freshKey.key}</code>
-                </p>
+                <KeyReveal
+                    appName={freshKey.appName}
+                    secret={freshKey.key}
+                    onDone={() => setFreshKey(null)}
+                />
             )}
 
             <CreateApp
@@ -155,28 +190,7 @@ function Apps() {
                                         <button
                                             type="button"
                                             className={shared.action}
-                                            onClick={async () => {
-                                                setError(null);
-                                                try {
-                                                    const data = await api<{
-                                                        app: ZarApp;
-                                                        key: string;
-                                                    }>(`/apps/${app.id}/key`, {
-                                                        method: "POST",
-                                                    });
-                                                    setFreshKey({
-                                                        appName: data.app.name,
-                                                        key: data.key,
-                                                    });
-                                                    await load();
-                                                } catch (err) {
-                                                    setError(
-                                                        err instanceof ApiError
-                                                            ? err.message
-                                                            : "Action failed",
-                                                    );
-                                                }
-                                            }}
+                                            onClick={() => regenerateKey(app)}
                                         >
                                             new key
                                         </button>
@@ -184,14 +198,8 @@ function Apps() {
                                             <button
                                                 type="button"
                                                 className={shared.action}
-                                                onClick={() =>
-                                                    act(() =>
-                                                        api(
-                                                            `/apps/${app.id}/revoke`,
-                                                            { method: "POST" },
-                                                        ),
-                                                    )
-                                                }
+                                                data-tone="danger"
+                                                onClick={() => revokeApp(app)}
                                             >
                                                 revoke
                                             </button>
@@ -209,6 +217,7 @@ function Apps() {
                     app={selected}
                     onChanged={load}
                     onError={setError}
+                    confirm={confirm}
                 />
             )}
         </>
@@ -289,10 +298,12 @@ function AccessPanel({
     app,
     onChanged,
     onError,
+    confirm,
 }: {
     app: ZarApp;
     onChanged: () => Promise<void>;
     onError: (message: string) => void;
+    confirm: ReturnType<typeof useConfirm>["confirm"];
 }) {
     const [accesses, setAccesses] = useState<AppAccess[] | null>(null);
     const [email, setEmail] = useState("");
@@ -333,9 +344,19 @@ function AccessPanel({
         }
     }
 
-    async function revoke(accessId: string) {
+    async function revoke(access: AppAccess) {
+        const ok = await confirm({
+            title: `revoke access for ${access.user?.email ?? access.email}?`,
+            detail: app.public
+                ? "The app is public, so this only matters if it goes private."
+                : "They can no longer obtain tokens for this app.",
+            action: "revoke",
+            danger: true,
+        });
+        if (!ok) return;
+
         try {
-            await api(`/apps/${app.id}/access/${accessId}`, {
+            await api(`/apps/${app.id}/access/${access.id}`, {
                 method: "DELETE",
             });
             await load();
@@ -415,7 +436,8 @@ function AccessPanel({
                                         <button
                                             type="button"
                                             className={shared.action}
-                                            onClick={() => revoke(access.id)}
+                                            data-tone="danger"
+                                            onClick={() => revoke(access)}
                                         >
                                             revoke
                                         </button>

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ApiError, api, type User } from "@/api";
+import { useConfirm } from "@/components/dialog/confirm";
 import { useAuth } from "@/context/auth";
 import { AdminOnly } from "./-admin";
 import shared from "./-shared.module.scss";
@@ -18,6 +19,7 @@ function Users() {
     const [users, setUsers] = useState<User[] | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [busyId, setBusyId] = useState<string | null>(null);
+    const { confirm, element: confirmDialog } = useConfirm();
 
     const load = useCallback(async () => {
         try {
@@ -46,14 +48,41 @@ function Users() {
         }
     }
 
-    function toggleDisabled(u: User) {
-        const verb = u.disabledAt ? "enable" : "disable";
-        void act(u.id, () => api(`/users/${u.id}/${verb}`, { method: "POST" }));
+    async function toggleDisabled(u: User) {
+        if (u.disabledAt) {
+            await act(u.id, () =>
+                api(`/users/${u.id}/enable`, { method: "POST" }),
+            );
+            return;
+        }
+
+        const ok = await confirm({
+            title: `disable ${u.email}?`,
+            detail: "They are signed out everywhere and cannot sign in until re-enabled.",
+            action: "disable",
+            danger: true,
+        });
+        if (!ok) return;
+
+        await act(u.id, () =>
+            api(`/users/${u.id}/disable`, { method: "POST" }),
+        );
     }
 
-    function toggleRole(u: User) {
+    async function toggleRole(u: User) {
         const role = u.role === "ADMIN" ? "USER" : "ADMIN";
-        void act(u.id, () =>
+        const ok = await confirm({
+            title: `${role === "ADMIN" ? "promote" : "demote"} ${u.email}?`,
+            detail:
+                role === "ADMIN"
+                    ? "Admins manage users, apps, settings and the audit log on auth.zar.mx."
+                    : "They lose access to this panel and its admin API.",
+            action: role === "ADMIN" ? "promote" : "demote",
+            danger: role === "ADMIN",
+        });
+        if (!ok) return;
+
+        await act(u.id, () =>
             api(`/users/${u.id}/role`, {
                 method: "PATCH",
                 body: JSON.stringify({ role }),
@@ -72,6 +101,7 @@ function Users() {
     return (
         <>
             {error && <p className={shared.error}>{error}</p>}
+            {confirmDialog}
 
             <div className={shared.wrap}>
                 <table className={shared.table}>
@@ -151,6 +181,11 @@ function Users() {
                                                 type="button"
                                                 className={shared.action}
                                                 disabled={self || busy}
+                                                data-tone={
+                                                    u.disabledAt
+                                                        ? undefined
+                                                        : "danger"
+                                                }
                                                 onClick={() =>
                                                     toggleDisabled(u)
                                                 }

@@ -1,0 +1,75 @@
+.dialog {
+    margin: auto;
+    padding: calc(0.25rem * 6);
+    max-width: min(32rem, calc(100% - 2rem));
+
+    font-size: 0.85rem;
+    color: var(--color-text);
+
+    background: var(--color-void);
+    border: 1px solid color-mix(in oklch, var(--color-text) 12%, transparent);
+    border-radius: 4px;
+
+    // Native <dialog> entry/exit: the platform handles display and the
+    // top layer; we only fade. @starting-style gives the open transition
+    // its "from" state, allow-discrete lets display/overlay wait for it.
+    opacity: 1;
+    transition:
+        opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        overlay 0.2s allow-discrete,
+        display 0.2s allow-discrete;
+
+    &:not([open]) {
+        opacity: 0;
+    }
+
+    @starting-style {
+        &[open] {
+            opacity: 0;
+        }
+    }
+
+    &::backdrop {
+        background: color-mix(in oklch, var(--color-void) 75%, transparent);
+        backdrop-filter: blur(2px);
+    }
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: calc(0.25rem * 4);
+}
+
+.title {
+    font-weight: 500;
+}
+
+.detail {
+    color: var(--color-muted);
+    font-size: 0.8rem;
+}
+
+.key {
+    padding: calc(0.25rem * 2) calc(0.25rem * 3);
+
+    font-size: 0.8rem;
+    word-break: break-all;
+    user-select: all;
+
+    border: 1px solid color-mix(in oklch, var(--color-accent) 30%, transparent);
+    border-radius: 2px;
+    background: color-mix(in oklch, var(--color-accent) 6%, transparent);
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(0.25rem * 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dialog {
+        transition: none;
+    }
+}
