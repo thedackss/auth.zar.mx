@@ -20,7 +20,8 @@
 
         nav {
             display: flex;
-            gap: calc(0.25rem * 5);
+            flex-wrap: wrap;
+            gap: calc(0.25rem * 2) calc(0.25rem * 5);
 
             a {
                 font-size: 0.85rem;
