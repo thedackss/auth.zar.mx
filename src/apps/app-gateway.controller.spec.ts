@@ -24,6 +24,7 @@ describe("AppGatewayController.token", () => {
     const tokens = { sign: jest.fn(() => ({ accessToken: "jwt" })) };
     const audit = { record: jest.fn() };
     const prisma = { client: { $transaction: jest.fn() } };
+    const sessions = { create: jest.fn() };
 
     const controller = new AppGatewayController(
         apps as never,
@@ -33,6 +34,7 @@ describe("AppGatewayController.token", () => {
         tokens as never,
         audit as never,
         prisma as never,
+        sessions as never,
     );
 
     beforeEach(() => jest.clearAllMocks());
@@ -87,6 +89,8 @@ describe("AppGatewayController.signUp", () => {
     const audit = { record: jest.fn() };
     const verification = { issue: jest.fn() };
     const prisma = { client: { $transaction: jest.fn() } };
+    const sessions = { create: jest.fn() };
+    const res = { cookie: jest.fn() } as never;
 
     const controller = new AppGatewayController(
         apps as never,
@@ -96,6 +100,7 @@ describe("AppGatewayController.signUp", () => {
         {} as never,
         audit as never,
         prisma as never,
+        sessions as never,
     );
 
     beforeEach(() => jest.clearAllMocks());
@@ -108,11 +113,13 @@ describe("AppGatewayController.signUp", () => {
                 app(),
                 { email: "x@domain.tld", password: "Str0ng!pass" },
                 req,
+                res,
             ),
         ).rejects.toBeInstanceOf(ForbiddenException);
 
         expect(prisma.client.$transaction).not.toHaveBeenCalled();
         expect(verification.issue).not.toHaveBeenCalled();
+        expect(sessions.create).not.toHaveBeenCalled();
         expect(audit.record).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: "SIGN_UP_FAILURE",

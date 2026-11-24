@@ -3,6 +3,7 @@ import { AuditModule } from "@/audit/audit.module";
 import { AuthModule } from "@/auth/auth.module";
 import { CredentialsModule } from "@/credentials/credentials.module";
 import { PrismaModule } from "@/prisma/prisma.module";
+import { SessionsModule } from "@/sessions/sessions.module";
 import { UsersModule } from "@/users/users.module";
 import { AppGatewayController } from "./app-gateway.controller";
 import { AppKeyGuard } from "./app-key.guard";
@@ -16,6 +17,7 @@ import { AppsService } from "./apps.service";
         AuthModule,
         CredentialsModule,
         UsersModule,
+        SessionsModule,
     ],
     controllers: [AppsController, AppGatewayController],
     providers: [AppsService, AppKeyGuard],

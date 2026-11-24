@@ -7,10 +7,11 @@ import {
     HttpStatus,
     Post,
     Req,
+    Res,
 } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
-import type { Request } from "express";
+import type { Request, Response } from "express";
 import { AuditService } from "@/audit/audit.service";
 import { requestMeta } from "@/audit/request-meta";
 import { Authenticated } from "@/auth/decorators/authenticated.decorator";
@@ -21,6 +22,8 @@ import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { CredentialsService } from "@/credentials/credentials.service";
 import type { App, User } from "@/prisma/generated/client";
 import { PrismaService } from "@/prisma/prisma.service";
+import { setSessionCookie } from "@/sessions/session-cookie";
+import { SessionsService } from "@/sessions/sessions.service";
 import { UsersService } from "@/users/users.service";
 import { AppsService } from "./apps.service";
 import {
@@ -45,6 +48,7 @@ export class AppGatewayController {
         private readonly tokens: TokenService,
         private readonly audit: AuditService,
         private readonly prisma: PrismaService,
+        private readonly sessions: SessionsService,
     ) {}
 
     @Post("sign-up")
@@ -55,6 +59,7 @@ export class AppGatewayController {
         @CurrentApp() app: App,
         @Body() body: SignUpDto,
         @Req() req: Request,
+        @Res({ passthrough: true }) res: Response,
     ) {
         let user: User;
         try {
@@ -81,6 +86,11 @@ export class AppGatewayController {
             email: user.email,
             locale: user.locale,
         });
+
+        // Same as direct sign-up: the new user is signed in, so the app does
+        // not have to replay the password through /sign-in.
+        const sessionId = await this.sessions.create({ userId: user.id });
+        setSessionCookie(res, sessionId);
 
         await this.audit.record({
             type: "SIGN_UP",
