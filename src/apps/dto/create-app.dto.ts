@@ -1,11 +1,15 @@
 import {
+    ArrayMaxSize,
+    IsArray,
     IsBoolean,
     IsOptional,
     IsString,
     IsUrl,
     MaxLength,
     MinLength,
+    Validate,
 } from "class-validator";
+import { IsRedirectUri } from "@/oauth/redirect-uri.validator";
 
 export class CreateAppDto {
     /**
@@ -39,4 +43,17 @@ export class CreateAppDto {
     @IsOptional()
     @IsBoolean()
     confidential?: boolean;
+
+    /**
+     * OAuth (PKCE) callback URIs, matched exactly. https URLs or custom
+     * schemes such as "xp24://auth/callback"; http only for localhost.
+     * @example ["https://app.domain.tld/auth/callback", "xp24://auth/callback"]
+     */
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(20)
+    @IsString({ each: true })
+    @MaxLength(512, { each: true })
+    @Validate(IsRedirectUri, { each: true })
+    redirectUris?: string[];
 }

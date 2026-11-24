@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { AuditModule } from "@/audit/audit.module";
 import { AuthModule } from "@/auth/auth.module";
 import { CredentialsModule } from "@/credentials/credentials.module";
+import { RefreshTokensModule } from "@/oauth/refresh-tokens.module";
 import { PrismaModule } from "@/prisma/prisma.module";
 import { SessionsModule } from "@/sessions/sessions.module";
 import { UsersModule } from "@/users/users.module";
@@ -18,6 +19,7 @@ import { AppsService } from "./apps.service";
         CredentialsModule,
         UsersModule,
         SessionsModule,
+        RefreshTokensModule,
     ],
     controllers: [AppsController, AppGatewayController],
     providers: [AppsService, AppKeyGuard],

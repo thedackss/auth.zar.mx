@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { RefreshTokensService } from "@/oauth/refresh-tokens.service";
 import type { App } from "@/prisma/generated/client";
 import type { PrismaTx } from "@/prisma/interfaces/transaction.interface";
 import { PrismaService } from "@/prisma/prisma.service";
@@ -13,6 +14,7 @@ export interface CreateAppProps {
     url?: string;
     public: boolean;
     confidential?: boolean;
+    redirectUris?: string[];
 }
 
 export interface UpdateAppProps {
@@ -20,11 +22,15 @@ export interface UpdateAppProps {
     url?: string | null;
     public?: boolean;
     confidential?: boolean;
+    redirectUris?: string[];
 }
 
 @Injectable()
 export class AppsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly refreshTokens: RefreshTokensService,
+    ) {}
 
     // Never expose keyHash outside this service.
     private readonly publicFields = {
@@ -33,6 +39,7 @@ export class AppsService {
         url: true,
         public: true,
         confidential: true,
+        redirectUris: true,
         createdAt: true,
         updatedAt: true,
         revokedAt: true,
@@ -107,6 +114,7 @@ export class AppsService {
                     url: props.url,
                     public: props.public,
                     confidential: props.confidential ?? false,
+                    redirectUris: props.redirectUris ?? [],
                     keyHash: this.hashKey(key),
                 },
                 select: this.publicFields,
@@ -147,6 +155,8 @@ export class AppsService {
 
     public async revoke(id: string) {
         await this.check(id);
+        // Native/cross-site sign-ins die with the app.
+        await this.refreshTokens.revokeAll({ appId: id });
 
         return this.prisma.client.app.update({
             where: { id },
@@ -219,6 +229,11 @@ export class AppsService {
             throw new NotFoundException("Access grant not found");
 
         await this.prisma.client.appAccess.delete({ where: { id: accessId } });
+        if (access.userId)
+            await this.refreshTokens.revokeAll({
+                appId,
+                userId: access.userId,
+            });
         return access;
     }
 

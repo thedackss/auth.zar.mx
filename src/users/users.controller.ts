@@ -16,6 +16,7 @@ import { AuditService } from "@/audit/audit.service";
 import { requestMeta } from "@/audit/request-meta";
 import { RequirePermissions } from "@/auth/decorators/require-permissions.decorator";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import { RefreshTokensService } from "@/oauth/refresh-tokens.service";
 import type { User } from "@/prisma/generated/client";
 import { SessionsService } from "@/sessions/sessions.service";
 import { FindOneUserDto } from "./dto/find-one.dto";
@@ -29,6 +30,7 @@ export class UsersController {
     constructor(
         private readonly users: UsersService,
         private readonly sessions: SessionsService,
+        private readonly refreshTokens: RefreshTokensService,
         private readonly audit: AuditService,
     ) {}
 
@@ -97,6 +99,7 @@ export class UsersController {
             data: { disabledAt: new Date() },
         });
         await this.sessions.destroyAll(id);
+        await this.refreshTokens.revokeAll({ userId: id });
 
         await this.audit.record({
             type: "ACCOUNT_DISABLED",
